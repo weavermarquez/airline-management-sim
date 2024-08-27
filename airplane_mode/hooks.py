@@ -129,6 +129,13 @@ app_license = "mit"
 # 		"on_trash": "method"
 # 	}
 # }
+#doc_events = {
+    #"File": {
+        #"before_udpate": "custom_app_name.custom_module_name.file.before_submit",
+        #"on_trash": "custom_app_name.custom_module_name.file.before_submit",
+        #"before_delete": "airplane_mode.airport_leasing.file_hooks.before_delete"
+    #}
+#}
 
 # Scheduled Tasks
 # ---------------
@@ -221,7 +228,7 @@ app_license = "mit"
 # ]
 
 # Automatically update python controller files with type annotations for this app.
-# export_python_type_annotations = True
+export_python_type_annotations = True
 
 # default_log_clearing_doctypes = {
 # 	"Logging DocType Name": 30  # days to retain logs

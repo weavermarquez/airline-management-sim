@@ -1,0 +1,21 @@
+{
+ "cards": [],
+ "charts": [
+  {
+   "chart": "Rooms",
+   "width": "Half"
+  }
+ ],
+ "creation": "2024-08-26 20:03:53.536472",
+ "dashboard_name": "Airport Leasing",
+ "docstatus": 0,
+ "doctype": "Dashboard",
+ "idx": 0,
+ "is_default": 0,
+ "is_standard": 1,
+ "modified": "2024-08-26 20:03:53.536472",
+ "modified_by": "Administrator",
+ "module": "Airport Leasing",
+ "name": "Airport Leasing",
+ "owner": "Administrator"
+}

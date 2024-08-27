@@ -1,0 +1,1 @@
+{{ doc.passenger }} booked new flight {{ doc.flight }} and is due {{ doc.flight_price }}.

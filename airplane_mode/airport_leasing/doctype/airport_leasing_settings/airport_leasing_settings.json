@@ -1,0 +1,49 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2024-08-26 22:15:59.769481",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "default_rental_rate",
+  "enable_payment_reminders"
+ ],
+ "fields": [
+  {
+   "default": "1000",
+   "fieldname": "default_rental_rate",
+   "fieldtype": "Int",
+   "label": "Default rental rate",
+   "non_negative": 1
+  },
+  {
+   "default": "1",
+   "fieldname": "enable_payment_reminders",
+   "fieldtype": "Check",
+   "label": "Enable payment reminders"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "issingle": 1,
+ "links": [],
+ "modified": "2024-08-26 22:17:43.996276",
+ "modified_by": "Administrator",
+ "module": "Airport Leasing",
+ "name": "Airport Leasing Settings",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "print": 1,
+   "read": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

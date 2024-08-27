@@ -1,0 +1,49 @@
+{
+ "actions": [],
+ "autoname": "autoincrement",
+ "creation": "2024-05-16 00:27:41.213249",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "data_rhxw",
+  "cart_items"
+ ],
+ "fields": [
+  {
+   "fieldname": "data_rhxw",
+   "fieldtype": "Data",
+   "label": "Name of Officer"
+  },
+  {
+   "fieldname": "cart_items",
+   "fieldtype": "Table",
+   "label": "Cart Items",
+   "options": "Airplane Ticket Add-on Item"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2024-05-16 00:38:41.160402",
+ "modified_by": "Administrator",
+ "module": "Airplane Mode",
+ "name": "Airplane Add-on Cart",
+ "naming_rule": "Autoincrement",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

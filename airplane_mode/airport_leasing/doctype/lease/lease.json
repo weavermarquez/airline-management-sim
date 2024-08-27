@@ -1,0 +1,100 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "prompt",
+ "creation": "2024-08-21 00:08:59.460362",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "section_break_dwck",
+  "leased_from",
+  "leased_to",
+  "leasing_of",
+  "amended_from",
+  "column_break_xjpb",
+  "start_date",
+  "end_date"
+ ],
+ "fields": [
+  {
+   "fieldname": "section_break_dwck",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "Lease",
+   "print_hide": 1,
+   "read_only": 1,
+   "search_index": 1
+  },
+  {
+   "fieldname": "start_date",
+   "fieldtype": "Date",
+   "label": "Start Date",
+   "reqd": 1
+  },
+  {
+   "fieldname": "end_date",
+   "fieldtype": "Date",
+   "label": "End Date",
+   "reqd": 1
+  },
+  {
+   "fieldname": "leased_from",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Leased From",
+   "options": "Company",
+   "reqd": 1
+  },
+  {
+   "fieldname": "leased_to",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Leased To",
+   "options": "Shop",
+   "reqd": 1
+  },
+  {
+   "fieldname": "leasing_of",
+   "fieldtype": "Link",
+   "label": "Leasing Of",
+   "options": "Room",
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_xjpb",
+   "fieldtype": "Column Break"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "is_submittable": 1,
+ "links": [],
+ "modified": "2024-08-26 20:43:19.799198",
+ "modified_by": "Administrator",
+ "module": "Airport Leasing",
+ "name": "Lease",
+ "naming_rule": "Set by user",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

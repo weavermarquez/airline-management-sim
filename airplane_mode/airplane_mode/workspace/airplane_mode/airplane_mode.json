@@ -1,0 +1,169 @@
+{
+ "charts": [],
+ "content": "[{\"id\":\"g8QSp2VECZ\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\">Airplane Mode</span>\",\"col\":12}},{\"id\":\"VKQBxR0bFp\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"All Airplanes\",\"col\":3}},{\"id\":\"3LX-AARfya\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Airlines\",\"col\":3}},{\"id\":\"kj4YTOSo4E\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Airplane Flight\",\"col\":3}},{\"id\":\"dJHbpWVUMO\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Airport\",\"col\":3}},{\"id\":\"UWRH5THRza\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Airplane Ticket Add On Type\",\"col\":3}},{\"id\":\"kSKgZvpRx4\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\">Flight Bookings</span>\",\"col\":12}},{\"id\":\"uGzalLRqzG\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Airplane Add On Cart\",\"col\":3}},{\"id\":\"v2zRSq-DHl\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Airplane Ticket\",\"col\":3}},{\"id\":\"1KXk26Vtcw\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\"><b>Etc.<br></b></span>\",\"col\":12}},{\"id\":\"TSd1hkNIfT\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"All Passengers\",\"col\":3}},{\"id\":\"P6ylC-dfi3\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Revenue By Airline\",\"col\":3}},{\"id\":\"vrnqRZjSpR\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\"><b>Airport Leasing <br></b></span>\",\"col\":12}},{\"id\":\"qbSVJ-cazw\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Active Leases\",\"col\":3}},{\"id\":\"txrpt7vzFY\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Airport Rooms\",\"col\":3}},{\"id\":\"nQYnXiqeB7\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Shop\",\"col\":3}},{\"id\":\"_m3oUb59s4\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Items\",\"col\":3}},{\"id\":\"dzpQo_gNKu\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Sales Orders\",\"col\":3}},{\"id\":\"ui-1vwNsFQ\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Sales Invoices\",\"col\":3}},{\"id\":\"9k8sSG3l7l\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Customer\",\"col\":3}}]",
+ "creation": "2024-05-15 19:56:32.104475",
+ "custom_blocks": [],
+ "docstatus": 0,
+ "doctype": "Workspace",
+ "for_user": "",
+ "hide_custom": 0,
+ "icon": "color-review-points",
+ "idx": 0,
+ "indicator_color": "green",
+ "is_hidden": 0,
+ "label": "Airplane Mode",
+ "links": [],
+ "modified": "2024-08-26 22:26:03.828135",
+ "modified_by": "Administrator",
+ "module": "Airplane Mode",
+ "name": "Airplane Mode",
+ "number_cards": [],
+ "owner": "Administrator",
+ "parent_page": "",
+ "public": 1,
+ "quick_lists": [],
+ "roles": [
+  {
+   "role": "Airport Authority Personnel"
+  },
+  {
+   "role": "Flight Crew Member"
+  },
+  {
+   "role": "Travel Agent"
+  },
+  {
+   "role": "Fleet Manager"
+  }
+ ],
+ "sequence_id": 28.0,
+ "shortcuts": [
+  {
+   "color": "Grey",
+   "doc_view": "List",
+   "label": "Airport",
+   "link_to": "Airport",
+   "stats_filter": "[]",
+   "type": "DocType"
+  },
+  {
+   "color": "Grey",
+   "doc_view": "List",
+   "label": "Items",
+   "link_to": "Item",
+   "stats_filter": "[]",
+   "type": "DocType"
+  },
+  {
+   "color": "Grey",
+   "doc_view": "List",
+   "label": "Customer",
+   "link_to": "Customer",
+   "type": "DocType"
+  },
+  {
+   "color": "Grey",
+   "doc_view": "List",
+   "label": "All Airplanes",
+   "link_to": "Airplane",
+   "stats_filter": "[]",
+   "type": "DocType"
+  },
+  {
+   "color": "Grey",
+   "doc_view": "List",
+   "label": "Airplane Ticket",
+   "link_to": "Airplane Ticket",
+   "stats_filter": "[]",
+   "type": "DocType"
+  },
+  {
+   "color": "Green",
+   "doc_view": "List",
+   "label": "Active Leases",
+   "link_to": "Lease",
+   "stats_filter": "[]",
+   "type": "DocType"
+  },
+  {
+   "color": "Grey",
+   "doc_view": "List",
+   "label": "Airplane Add On Cart",
+   "link_to": "Airplane Add-on Cart",
+   "stats_filter": "[]",
+   "type": "DocType"
+  },
+  {
+   "color": "Grey",
+   "doc_view": "List",
+   "label": "Airplane Ticket Add On Type",
+   "link_to": "Airplane Ticket Add-on Type",
+   "stats_filter": "[]",
+   "type": "DocType"
+  },
+  {
+   "color": "Grey",
+   "doc_view": "List",
+   "label": "Sales Orders",
+   "link_to": "Sales Order",
+   "stats_filter": "[]",
+   "type": "DocType"
+  },
+  {
+   "color": "Grey",
+   "doc_view": "List",
+   "label": "Airlines",
+   "link_to": "Airline",
+   "stats_filter": "[]",
+   "type": "DocType"
+  },
+  {
+   "color": "Grey",
+   "doc_view": "List",
+   "label": "Airport Rooms",
+   "link_to": "Room",
+   "stats_filter": "[]",
+   "type": "DocType"
+  },
+  {
+   "color": "Grey",
+   "doc_view": "List",
+   "label": "Airplane Flight",
+   "link_to": "Airplane Flight",
+   "stats_filter": "[]",
+   "type": "DocType"
+  },
+  {
+   "color": "Grey",
+   "doc_view": "List",
+   "label": "Revenue By Airline",
+   "link_to": "Revenue By Airline",
+   "type": "Report"
+  },
+  {
+   "color": "Grey",
+   "doc_view": "List",
+   "label": "Sales Invoices",
+   "link_to": "Sales Invoice",
+   "stats_filter": "[]",
+   "type": "DocType"
+  },
+  {
+   "color": "Grey",
+   "doc_view": "List",
+   "label": "All Passengers",
+   "link_to": "Flight Passenger",
+   "stats_filter": "[]",
+   "type": "DocType"
+  },
+  {
+   "color": "Grey",
+   "doc_view": "List",
+   "label": "Shop",
+   "link_to": "Shop",
+   "stats_filter": "[]",
+   "type": "DocType"
+  }
+ ],
+ "title": "Airplane Mode"
+}

@@ -1,0 +1,3 @@
+{% set color = frappe.form_dict.color if frappe.form_dict.color else 'black' %}
+
+<div style="height: 200px; background-color: {{ color }}" ></div>

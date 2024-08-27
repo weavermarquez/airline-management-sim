@@ -1,0 +1,47 @@
+{
+ "add_total_row": 0,
+ "columns": [
+  {
+   "fieldname": "airport_code",
+   "fieldtype": "Data",
+   "label": "Airport Code",
+   "width": 0
+  },
+  {
+   "fieldname": "vacant_count",
+   "fieldtype": "Int",
+   "label": "Vacant Rooms",
+   "width": 0
+  },
+  {
+   "fieldname": "non_vacant_count",
+   "fieldtype": "Int",
+   "label": "Non-Vacant Rooms",
+   "width": 0
+  }
+ ],
+ "creation": "2024-08-26 20:29:07.596474",
+ "disabled": 0,
+ "docstatus": 0,
+ "doctype": "Report",
+ "filters": [],
+ "idx": 0,
+ "is_standard": "Yes",
+ "json": "{}",
+ "letterhead": null,
+ "modified": "2024-08-26 21:01:18.659568",
+ "modified_by": "Administrator",
+ "module": "Airport Leasing",
+ "name": "Vacancy per Airport",
+ "owner": "Administrator",
+ "prepared_report": 0,
+ "query": "WITH RoomStatus AS (\n    SELECT \n        rm.name AS room_name,\n        rm.airport_code,\n        CASE \n            WHEN ls.name IS NOT NULL \n                AND ls.docstatus = 1\n                AND CURDATE() BETWEEN ls.start_date AND ls.end_date \n            THEN 'Non-Vacant'\n            ELSE 'Vacant'\n        END AS status\n    FROM \n        tabRoom rm\n    LEFT JOIN \n        tabLease ls ON rm.name = ls.leasing_of\n)\nSELECT \n    airport_code,\n    SUM(CASE WHEN status = 'Vacant' THEN 1 ELSE 0 END) AS vacant_count,\n    SUM(CASE WHEN status = 'Non-Vacant' THEN 1 ELSE 0 END) AS non_vacant_count\nFROM \n    RoomStatus\nGROUP BY \n    airport_code\nORDER BY \n    non_vacant_count DESC;\n",
+ "ref_doctype": "Room",
+ "report_name": "Vacancy per Airport",
+ "report_type": "Query Report",
+ "roles": [
+  {
+   "role": "System Manager"
+  }
+ ]
+}

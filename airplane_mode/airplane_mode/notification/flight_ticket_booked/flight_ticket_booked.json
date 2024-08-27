@@ -1,0 +1,28 @@
+{
+ "attach_print": 0,
+ "channel": "System Notification",
+ "creation": "2024-05-21 14:33:58.582242",
+ "days_in_advance": 0,
+ "docstatus": 0,
+ "doctype": "Notification",
+ "document_type": "Airplane Ticket",
+ "enabled": 1,
+ "event": "New",
+ "idx": 0,
+ "is_standard": 1,
+ "message": "{{ doc.passenger }} booked new flight {{ doc.flight }} and is due {{ doc.flight_price }}.",
+ "message_type": "Plain Text",
+ "modified": "2024-05-21 14:33:58.582242",
+ "modified_by": "Administrator",
+ "module": "Airplane Mode",
+ "name": "Flight Ticket Booked",
+ "owner": "Administrator",
+ "recipients": [
+  {
+   "receiver_by_role": "System Manager"
+  }
+ ],
+ "send_system_notification": 0,
+ "send_to_all_assignees": 0,
+ "subject": "{{ doc.passenger }} booked new flight {{ doc.flight }}"
+}

@@ -1,0 +1,61 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "prompt",
+ "creation": "2024-08-21 00:21:47.874134",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "owned_by",
+  "store_number",
+  "contact_information"
+ ],
+ "fields": [
+  {
+   "fieldname": "owned_by",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Owned By",
+   "options": "Customer",
+   "reqd": 1
+  },
+  {
+   "fetch_from": "owned_by.customer_name",
+   "fieldname": "contact_information",
+   "fieldtype": "Data",
+   "label": "Tenant Name"
+  },
+  {
+   "fieldname": "store_number",
+   "fieldtype": "Int",
+   "label": "Store Number",
+   "non_negative": 1,
+   "reqd": 1
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2024-08-26 16:38:39.106720",
+ "modified_by": "Administrator",
+ "module": "Airport Leasing",
+ "name": "Shop",
+ "naming_rule": "Set by user",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

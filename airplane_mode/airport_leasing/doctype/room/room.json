@@ -1,0 +1,106 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "format:{airport_code}{room_number}",
+ "creation": "2024-08-21 00:11:11.535764",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "airport",
+  "address",
+  "operated_by",
+  "column_break_ccyi",
+  "room_number",
+  "item",
+  "airport_code",
+  "section_break_ixlm",
+  "area",
+  "capacity"
+ ],
+ "fields": [
+  {
+   "fieldname": "area",
+   "fieldtype": "Int",
+   "label": "Area"
+  },
+  {
+   "fieldname": "capacity",
+   "fieldtype": "Int",
+   "label": "Capacity"
+  },
+  {
+   "fieldname": "address",
+   "fieldtype": "Link",
+   "label": "Address",
+   "options": "Address"
+  },
+  {
+   "fieldname": "operated_by",
+   "fieldtype": "Link",
+   "label": "Operated By",
+   "options": "Shop"
+  },
+  {
+   "fieldname": "airport",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Airport",
+   "options": "Airport",
+   "reqd": 1,
+   "set_only_once": 1
+  },
+  {
+   "fieldname": "section_break_ixlm",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "column_break_ccyi",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "room_number",
+   "fieldtype": "Int",
+   "label": "Room Number",
+   "reqd": 1,
+   "set_only_once": 1
+  },
+  {
+   "fieldname": "item",
+   "fieldtype": "Link",
+   "label": "Item",
+   "options": "Item",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "airport.code",
+   "fieldname": "airport_code",
+   "fieldtype": "Read Only",
+   "label": "Airport Code"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2024-08-26 20:11:23.842276",
+ "modified_by": "Administrator",
+ "module": "Airport Leasing",
+ "name": "Room",
+ "naming_rule": "Expression",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}
