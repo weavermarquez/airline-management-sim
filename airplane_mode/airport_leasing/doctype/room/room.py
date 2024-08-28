@@ -73,11 +73,9 @@ def create_item(doc: str):
 		frappe.Document: The newly created Item document
 	"""
 	doc_dict = json.loads(doc)
-	# Note that I can't seem to access fields of doc_dict with dot notation.
-	# Instead, I have to use doc_dict['field'].
 
 	airport_code = frappe.db.get_value('Airport', doc_dict['airport'], 'code')
-	rental_rate = frappe.db.get_single_value('Airport Leasing Settings', 'default_rental_rate') 
+	rental_rate = frappe.get_doc('Airport Leasing Settings').default_rental_rate
 
 	item = frappe.new_doc('Item', 
 		item_code = f"{airport_code}{doc_dict['room_number']}",
@@ -94,7 +92,7 @@ def create_item(doc: str):
 	item.insert()
 
 	frappe.msgprint(
-		msg='Item "%s" created as and associated to this Room.' % (item.name),
+		msg='Item "%s" created and associated to this Room.' % (item.name),
 		title='Room Item Creation',
 		indicator='green')
 	pass
