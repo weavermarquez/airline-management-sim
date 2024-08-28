@@ -1,44 +1,50 @@
 {
- "actions": [],
+ "actions": [
+  {
+   "action": "airplane_mode.airport_leasing.doctype.room.room.create_item",
+   "action_type": "Server Action",
+   "label": "Create Item Record"
+  }
+ ],
  "allow_rename": 1,
- "autoname": "format:{airport_code}{room_number}",
  "creation": "2024-08-21 00:11:11.535764",
  "doctype": "DocType",
  "engine": "InnoDB",
  "field_order": [
+  "location_section",
   "airport",
-  "address",
-  "operated_by",
-  "column_break_ccyi",
   "room_number",
-  "item",
-  "airport_code",
-  "section_break_ixlm",
+  "column_break_kzbp",
   "area",
-  "capacity"
+  "capacity",
+  "section_break_koqt",
+  "status",
+  "operated_by",
+  "amended_from"
  ],
  "fields": [
   {
    "fieldname": "area",
    "fieldtype": "Int",
-   "label": "Area"
+   "in_list_view": 1,
+   "label": "Area",
+   "non_negative": 1,
+   "reqd": 1
   },
   {
    "fieldname": "capacity",
    "fieldtype": "Int",
-   "label": "Capacity"
-  },
-  {
-   "fieldname": "address",
-   "fieldtype": "Link",
-   "label": "Address",
-   "options": "Address"
+   "in_list_view": 1,
+   "label": "Capacity",
+   "non_negative": 1,
+   "reqd": 1
   },
   {
    "fieldname": "operated_by",
    "fieldtype": "Link",
    "label": "Operated By",
-   "options": "Shop"
+   "options": "Shop",
+   "read_only": 1
   },
   {
    "fieldname": "airport",
@@ -50,41 +56,63 @@
    "set_only_once": 1
   },
   {
-   "fieldname": "section_break_ixlm",
-   "fieldtype": "Section Break"
-  },
-  {
-   "fieldname": "column_break_ccyi",
-   "fieldtype": "Column Break"
-  },
-  {
    "fieldname": "room_number",
    "fieldtype": "Int",
+   "in_list_view": 1,
    "label": "Room Number",
+   "no_copy": 1,
+   "non_negative": 1,
    "reqd": 1,
    "set_only_once": 1
   },
   {
-   "fieldname": "item",
-   "fieldtype": "Link",
-   "label": "Item",
-   "options": "Item",
+   "fieldname": "section_break_koqt",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "location_section",
+   "fieldtype": "Section Break",
+   "label": "Location"
+  },
+  {
+   "default": "Vacant",
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "label": "Status",
+   "options": "Vacant\nLeased\nUnder maintenance",
    "read_only": 1
   },
   {
-   "fetch_from": "airport.code",
-   "fieldname": "airport_code",
-   "fieldtype": "Read Only",
-   "label": "Airport Code"
+   "fieldname": "column_break_kzbp",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "Room",
+   "print_hide": 1,
+   "read_only": 1,
+   "search_index": 1
   }
  ],
  "index_web_pages_for_search": 1,
- "links": [],
- "modified": "2024-08-26 20:11:23.842276",
+ "links": [
+  {
+   "link_doctype": "Item",
+   "link_fieldname": "name"
+  },
+  {
+   "link_doctype": "Lease",
+   "link_fieldname": "leasing_of"
+  }
+ ],
+ "modified": "2024-08-27 19:25:30.612805",
  "modified_by": "Administrator",
  "module": "Airport Leasing",
  "name": "Room",
- "naming_rule": "Expression",
+ "naming_rule": "By script",
  "owner": "Administrator",
  "permissions": [
   {
@@ -102,5 +130,18 @@
  ],
  "sort_field": "modified",
  "sort_order": "DESC",
- "states": []
+ "states": [
+  {
+   "color": "Green",
+   "title": "Leased"
+  },
+  {
+   "color": "Orange",
+   "title": "Vacant"
+  },
+  {
+   "color": "Yellow",
+   "title": "Under maintenance"
+  }
+ ]
 }
