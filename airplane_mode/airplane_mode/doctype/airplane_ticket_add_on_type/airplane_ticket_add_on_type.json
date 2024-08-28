@@ -1,5 +1,11 @@
 {
- "actions": [],
+ "actions": [
+  {
+   "action": "airplane_mode.airplane_mode.doctype.airplane_ticket_add_on_type.airplane_ticket_add_on_type.create_duplicate",
+   "action_type": "Server Action",
+   "label": "Create Duplicate"
+  }
+ ],
  "allow_rename": 1,
  "autoname": "prompt",
  "creation": "2024-05-15 20:14:05.924116",
@@ -50,7 +56,7 @@
    "link_fieldname": "item"
   }
  ],
- "modified": "2024-06-04 00:43:57.714086",
+ "modified": "2024-08-28 16:35:25.259476",
  "modified_by": "Administrator",
  "module": "Airplane Mode",
  "name": "Airplane Ticket Add-on Type",
