@@ -5,6 +5,11 @@ import frappe
 import json
 from frappe.model.document import Document
 
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+	from frappe.types import DF
+	from erpnext.stock.doctype.item.item import Item
 
 class Room(Document):
 	# begin: auto-generated types
@@ -49,44 +54,28 @@ class Room(Document):
 	# 	return item
 
 	def autoname(self):
-		self.name = f"{frappe.db.get_value('Airport', self.airport, 'code')}{self.room_number}"
+		self.name = f"{frappe.get_value('Airport', self.airport, 'code')}{self.room_number}"
 
 
 # TODO Fix the fragility of this function with try / except.
 @frappe.whitelist()
-def create_item(doc: str):
-	"""
-	Creates a related Item entry for the Room.
+def create_item(doc: str) -> None:
+	room: Room = frappe.get_doc(json.loads(doc))
 
-	This method generates a new Item document with the following details:
-	- Item code: Combination of airport code and room number
-	- Item group: 'Real Estate Leasing'
-	- Stock UOM: 'Week'
-	- Sales UOM: 'Week'
-	- Is stock item: False
-	- Is purchase item: False
-	- Grant commission: False
-	- Include item in manufacturing: False
-	- Standard rate: Default rental rate from Airport Leasing Settings
+	airport_code: str = frappe.get_value('Airport', room.airport, 'code')
+	rental_rate: int = frappe.get_doc('Airport Leasing Settings').default_rental_rate
+	uom: str = 'Week'
 
-	Returns:
-		frappe.Document: The newly created Item document
-	"""
-	doc_dict = json.loads(doc)
-
-	airport_code = frappe.db.get_value('Airport', doc_dict['airport'], 'code')
-	rental_rate = frappe.get_doc('Airport Leasing Settings').default_rental_rate
-
-	item = frappe.new_doc('Item', 
-		item_code = f"{airport_code}{doc_dict['room_number']}",
+	item: Item = frappe.new_doc('Item', 
+		item_code = f"{airport_code}{room.room_number}",
 		item_group = 'Real Estate Leasing',
-		stock_uom = 'Week',
+		stock_uom = uom,
+		sales_uom = uom,
+		standard_rate = rental_rate,
 		is_stock_item = 0,
 		is_purchase_item = 0,
 		grant_commission = 0,
-		sales_uom = 'Week',
 		include_item_in_manufacturing = 0,
-		standard_rate = rental_rate
 	)
 
 	item.insert()
@@ -95,4 +84,4 @@ def create_item(doc: str):
 		msg='Item "%s" created and associated to this Room.' % (item.name),
 		title='Room Item Creation',
 		indicator='green')
-	pass
+	return
