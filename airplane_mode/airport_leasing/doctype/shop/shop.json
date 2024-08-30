@@ -7,8 +7,8 @@
  "engine": "InnoDB",
  "field_order": [
   "owned_by",
-  "store_number",
-  "contact_information"
+  "column_break_xuvb",
+  "shop_number"
  ],
  "fields": [
   {
@@ -20,22 +20,19 @@
    "reqd": 1
   },
   {
-   "fetch_from": "owned_by.customer_name",
-   "fieldname": "contact_information",
-   "fieldtype": "Data",
-   "label": "Tenant Name"
+   "fieldname": "shop_number",
+   "fieldtype": "Int",
+   "label": "Shop Number",
+   "read_only": 1
   },
   {
-   "fieldname": "store_number",
-   "fieldtype": "Int",
-   "label": "Store Number",
-   "non_negative": 1,
-   "reqd": 1
+   "fieldname": "column_break_xuvb",
+   "fieldtype": "Column Break"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-08-26 16:38:39.106720",
+ "modified": "2024-08-27 16:56:01.138805",
  "modified_by": "Administrator",
  "module": "Airport Leasing",
  "name": "Shop",

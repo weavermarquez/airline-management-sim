@@ -14,8 +14,7 @@ class Shop(Document):
 	if TYPE_CHECKING:
 		from frappe.types import DF
 
-		contact_information: DF.Data | None
 		owned_by: DF.Link
-		store_number: DF.Int
+		shop_number: DF.Int
 	# end: auto-generated types
 	pass
