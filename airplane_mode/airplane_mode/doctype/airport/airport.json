@@ -6,9 +6,10 @@
  "doctype": "DocType",
  "engine": "InnoDB",
  "field_order": [
-  "code",
   "city",
-  "country"
+  "country",
+  "column_break_zvcf",
+  "code"
  ],
  "fields": [
   {
@@ -16,7 +17,9 @@
    "fieldtype": "Data",
    "in_list_view": 1,
    "label": "Code",
-   "reqd": 1
+   "reqd": 1,
+   "set_only_once": 1,
+   "unique": 1
   },
   {
    "fieldname": "city",
@@ -31,11 +34,20 @@
    "in_list_view": 1,
    "label": "Country",
    "reqd": 1
+  },
+  {
+   "fieldname": "column_break_zvcf",
+   "fieldtype": "Column Break"
   }
  ],
  "index_web_pages_for_search": 1,
- "links": [],
- "modified": "2024-06-04 00:36:18.735738",
+ "links": [
+  {
+   "link_doctype": "Room",
+   "link_fieldname": "airport"
+  }
+ ],
+ "modified": "2024-08-27 17:16:55.519598",
  "modified_by": "Administrator",
  "module": "Airplane Mode",
  "name": "Airport",
