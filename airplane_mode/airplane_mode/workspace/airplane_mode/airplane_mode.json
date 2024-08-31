@@ -13,7 +13,7 @@
  "is_hidden": 0,
  "label": "Airplane Mode",
  "links": [],
- "modified": "2024-08-26 22:26:03.828135",
+ "modified": "2024-08-27 14:59:01.772925",
  "modified_by": "Administrator",
  "module": "Airplane Mode",
  "name": "Airplane Mode",
@@ -49,14 +49,6 @@
   {
    "color": "Grey",
    "doc_view": "List",
-   "label": "Items",
-   "link_to": "Item",
-   "stats_filter": "[]",
-   "type": "DocType"
-  },
-  {
-   "color": "Grey",
-   "doc_view": "List",
    "label": "Customer",
    "link_to": "Customer",
    "type": "DocType"
@@ -75,6 +67,14 @@
    "label": "Airplane Ticket",
    "link_to": "Airplane Ticket",
    "stats_filter": "[]",
+   "type": "DocType"
+  },
+  {
+   "color": "Grey",
+   "doc_view": "List",
+   "label": "Items",
+   "link_to": "Item",
+   "stats_filter": "[[\"Item\",\"item_group\",\"=\",\"Real Estate Leasing\",false]]",
    "type": "DocType"
   },
   {
