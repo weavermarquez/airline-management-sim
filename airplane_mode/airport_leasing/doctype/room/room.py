@@ -30,45 +30,43 @@ class Room(Document):
 	# end: auto-generated types
 	pass
 
-	# def create_related_item_entry(self):
-	# 	airport_code = frappe.db.get_value('Airport', self.airport, 'code')
-	# 	rental_rate = frappe.db.get_single_value('Airport Leasing Settings', 'default_rental_rate') 
-		
-	# 	item = frappe.new_doc( 'Item', 
-	# 		item_code = f'{airport_code}{self.room_number}',
-	# 		item_group = 'Real Estate Leasing',
-	# 		stock_uom = 'Week',
-	# 		is_stock_item = 0,
-	# 		is_purchase_item = 0,
-	# 		grant_commission = 0,
-	# 		sales_uom = 'Week',
-	# 		include_item_in_manufacturing = 0,
-	# 		standard_rate = rental_rate
-	# 	)
-	# 	# TODO Should I add Item Tax Template fields as well?
-
-	# 	# TODO Set the below if this room is somehow not for use.
-	# 	# is_sales_item = 0,
-
-	# 	item.insert()
-	# 	return item
+	def on_submit(self):
+		_create_item(self)
 
 	def autoname(self):
-		self.name = f"{frappe.get_value('Airport', self.airport, 'code')}{self.room_number}"
+		self.name = self.room_name()
+
+	def room_name(self):
+		airport_code = frappe.get_value('Airport', self.airport, 'code')
+		return f"{airport_code}{self.room_number}"
+
+
+@frappe.whitelist()
+def default_uom() -> str:
+	uom: str = frappe.db.get_single_value('Airport Leasing Settings', 'default_uom')
+	if not uom:
+		uom = 'Week'
+	return uom
 
 
 # TODO Fix the fragility of this function with try / except.
 @frappe.whitelist()
 def create_item(doc: str) -> None:
 	room: Room = frappe.get_doc(json.loads(doc))
+	return _create_item(room)
 
-	airport_code: str = frappe.get_value('Airport', room.airport, 'code')
+def _create_item(room: Room) -> None:
 	rental_rate: int = frappe.get_doc('Airport Leasing Settings').default_rental_rate
-	uom: str = 'Week'
+	# I need to use get_doc because get_single_value doesn't retrieve defaults.
+	item_code = room.room_name()
+	uom = default_uom()
+
+	item_group = 'Real Estate Leasing'
+	# TODO I should really add a field to the Airport Leasing Setttings about Units of Measurement.
 
 	item: Item = frappe.new_doc('Item', 
-		item_code = f"{airport_code}{room.room_number}",
-		item_group = 'Real Estate Leasing',
+		item_code = item_code,
+		item_group = item_group,
 		stock_uom = uom,
 		sales_uom = uom,
 		standard_rate = rental_rate,
@@ -81,7 +79,6 @@ def create_item(doc: str) -> None:
 	item.insert()
 
 	frappe.msgprint(
-		msg='Item "%s" created and associated to this Room.' % (item.name),
+		msg='Item "%s" created and associated to this Room.' % (item_code),
 		title='Room Item Creation',
 		indicator='green')
-	return

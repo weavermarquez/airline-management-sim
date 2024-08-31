@@ -1,5 +1,21 @@
 {
- "actions": [],
+ "actions": [
+  {
+   "action": "airplane_mode.airport_leasing.doctype.lease.lease.create_repeating_sales_order",
+   "action_type": "Server Action",
+   "label": "Create Sales Order"
+  },
+  {
+   "action": "airplane_mode.airport_leasing.doctype.lease.lease.create_sales_invoice",
+   "action_type": "Server Action",
+   "label": "Create Sales Invoice"
+  },
+  {
+   "action": "airplane_mode.airport_leasing.doctype.lease.lease.create_owo",
+   "action_type": "Server Action",
+   "label": "Create OwO"
+  }
+ ],
  "allow_rename": 1,
  "autoname": "prompt",
  "creation": "2024-08-21 00:08:59.460362",
@@ -8,12 +24,16 @@
  "field_order": [
   "section_break_dwck",
   "leased_from",
-  "leased_to",
-  "leasing_of",
-  "amended_from",
-  "column_break_xjpb",
   "start_date",
-  "end_date"
+  "leasing_of",
+  "column_break_xjpb",
+  "leased_to",
+  "end_date",
+  "invoice_frequency",
+  "section_break_voso",
+  "amended_from",
+  "item",
+  "transactions"
  ],
  "fields": [
   {
@@ -68,12 +88,38 @@
   {
    "fieldname": "column_break_xjpb",
    "fieldtype": "Column Break"
+  },
+  {
+   "default": "Monthly",
+   "fieldname": "invoice_frequency",
+   "fieldtype": "Select",
+   "label": "Invoice Frequency",
+   "options": "Monthly\nQuarterly",
+   "reqd": 1
+  },
+  {
+   "fieldname": "section_break_voso",
+   "fieldtype": "Section Break",
+   "label": "References"
+  },
+  {
+   "fieldname": "item",
+   "fieldtype": "Link",
+   "label": "Item",
+   "options": "Item"
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "transactions",
+   "fieldtype": "Table",
+   "label": "Transactions",
+   "options": "Lease Transaction"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2024-08-26 20:43:19.799198",
+ "modified": "2024-08-30 01:31:46.022224",
  "modified_by": "Administrator",
  "module": "Airport Leasing",
  "name": "Lease",

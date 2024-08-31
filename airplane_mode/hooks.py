@@ -122,20 +122,23 @@ app_license = "mit"
 # ---------------
 # Hook on document methods and events
 
+doc_events = {
+	"SalesOrder": {
+		"on_submit": "airplane_mode.airport_leasing.lease_sales_order.on_submit_sales_order",
+	},
+}
 # doc_events = {
 # 	"*": {
 # 		"on_update": "method",
 # 		"on_cancel": "method",
 # 		"on_trash": "method"
-# 	}
+# 	},
+#     "File": {
+#         "before_udpate": "custom_app_name.custom_module_name.file.before_submit",
+#         "on_trash": "custom_app_name.custom_module_name.file.before_submit",
+#         "before_delete": "airplane_mode.airport_leasing.file_hooks.before_delete",
+#     },
 # }
-#doc_events = {
-    #"File": {
-        #"before_udpate": "custom_app_name.custom_module_name.file.before_submit",
-        #"on_trash": "custom_app_name.custom_module_name.file.before_submit",
-        #"before_delete": "airplane_mode.airport_leasing.file_hooks.before_delete"
-    #}
-#}
 
 # Scheduled Tasks
 # ---------------
