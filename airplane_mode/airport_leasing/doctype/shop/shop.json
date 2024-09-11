@@ -1,14 +1,33 @@
 {
  "actions": [],
  "allow_rename": 1,
- "autoname": "prompt",
+ "autoname": "field:shop_name",
  "creation": "2024-08-21 00:21:47.874134",
  "doctype": "DocType",
  "engine": "InnoDB",
  "field_order": [
+  "shop_overview_section",
   "owned_by",
-  "column_break_xuvb",
-  "shop_number"
+  "shop_name",
+  "column_break_ndjv",
+  "shop_number",
+  "shop_type",
+  "section_break_robk",
+  "customer_primary_address",
+  "primary_address",
+  "column_break_cfrz",
+  "customer_type",
+  "customer_primary_contact",
+  "mobile_number",
+  "email_id",
+  "primary_address_details_section",
+  "address_line1",
+  "address_line2",
+  "pincode",
+  "column_break_oohk",
+  "city",
+  "state",
+  "country"
  ],
  "fields": [
   {
@@ -23,20 +42,131 @@
    "fieldname": "shop_number",
    "fieldtype": "Int",
    "label": "Shop Number",
+   "non_negative": 1
+  },
+  {
+   "fetch_from": "owned_by.customer_type",
+   "fieldname": "customer_type",
+   "fieldtype": "Read Only",
+   "hidden": 1,
+   "label": "Customer Type"
+  },
+  {
+   "fetch_from": "owned_by.email_id",
+   "fieldname": "email_id",
+   "fieldtype": "Read Only",
+   "label": "Email ID",
    "read_only": 1
   },
   {
-   "fieldname": "column_break_xuvb",
+   "fetch_from": "owned_by.mobile_no",
+   "fieldname": "mobile_number",
+   "fieldtype": "Data",
+   "label": "Mobile Number",
+   "read_only": 1
+  },
+  {
+   "fieldname": "primary_address_details_section",
+   "fieldtype": "Section Break",
+   "hidden": 1,
+   "label": "Primary Address Details"
+  },
+  {
+   "fieldname": "pincode",
+   "fieldtype": "Data",
+   "label": "Pincode"
+  },
+  {
+   "fieldname": "column_break_oohk",
    "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "city",
+   "fieldtype": "Data",
+   "label": "City"
+  },
+  {
+   "fieldname": "state",
+   "fieldtype": "Data",
+   "label": "State"
+  },
+  {
+   "fieldname": "country",
+   "fieldtype": "Data",
+   "label": "Country"
+  },
+  {
+   "fieldname": "address_line1",
+   "fieldtype": "Data",
+   "label": "Address Line 1"
+  },
+  {
+   "fieldname": "address_line2",
+   "fieldtype": "Data",
+   "label": "Address Line 2"
+  },
+  {
+   "fieldname": "section_break_robk",
+   "fieldtype": "Section Break",
+   "label": "Tenant Information"
+  },
+  {
+   "fetch_from": "owned_by.customer_primary_address",
+   "fieldname": "customer_primary_address",
+   "fieldtype": "Link",
+   "label": "Customer Primary Address",
+   "options": "Address",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_cfrz",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fetch_from": "owned_by.customer_primary_contact",
+   "fieldname": "customer_primary_contact",
+   "fieldtype": "Link",
+   "label": "Customer Primary Contact",
+   "options": "Contact",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "owned_by.primary_address",
+   "fieldname": "primary_address",
+   "fieldtype": "Text",
+   "label": "Primary Address",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_ndjv",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "shop_overview_section",
+   "fieldtype": "Section Break",
+   "label": "Shop Overview"
+  },
+  {
+   "fieldname": "shop_name",
+   "fieldtype": "Data",
+   "label": "Shop Name",
+   "reqd": 1,
+   "unique": 1
+  },
+  {
+   "fieldname": "shop_type",
+   "fieldtype": "Select",
+   "label": "Shop Type",
+   "options": "Restaurant\nRetail\nServices"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-08-27 16:56:01.138805",
+ "modified": "2024-09-10 16:38:39.587654",
  "modified_by": "Administrator",
  "module": "Airport Leasing",
  "name": "Shop",
- "naming_rule": "Set by user",
+ "naming_rule": "By fieldname",
  "owner": "Administrator",
  "permissions": [
   {
