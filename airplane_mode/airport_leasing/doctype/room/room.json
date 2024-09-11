@@ -12,15 +12,22 @@
  "engine": "InnoDB",
  "field_order": [
   "location_section",
+  "amended_from",
   "airport",
   "room_number",
   "column_break_kzbp",
+  "rental_rate",
+  "physical_properties_section",
   "area",
   "capacity",
-  "section_break_koqt",
-  "status",
+  "entrances_and_exits",
+  "column_break_pmak",
+  "length",
+  "width",
+  "height",
+  "section_break_erox",
   "operated_by",
-  "amended_from"
+  "status"
  ],
  "fields": [
   {
@@ -66,10 +73,6 @@
    "set_only_once": 1
   },
   {
-   "fieldname": "section_break_koqt",
-   "fieldtype": "Section Break"
-  },
-  {
    "fieldname": "location_section",
    "fieldtype": "Section Break",
    "label": "Location"
@@ -95,9 +98,54 @@
    "print_hide": 1,
    "read_only": 1,
    "search_index": 1
+  },
+  {
+   "fieldname": "rental_rate",
+   "fieldtype": "Int",
+   "label": "Rental Rate",
+   "non_negative": 1
+  },
+  {
+   "fieldname": "section_break_erox",
+   "fieldtype": "Section Break",
+   "label": "Reference"
+  },
+  {
+   "fieldname": "physical_properties_section",
+   "fieldtype": "Section Break",
+   "label": "Physical Properties"
+  },
+  {
+   "fieldname": "entrances_and_exits",
+   "fieldtype": "Int",
+   "label": "Entrances and Exits",
+   "non_negative": 1
+  },
+  {
+   "fieldname": "column_break_pmak",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "length",
+   "fieldtype": "Float",
+   "label": "Length",
+   "non_negative": 1
+  },
+  {
+   "fieldname": "width",
+   "fieldtype": "Float",
+   "label": "Width",
+   "non_negative": 1
+  },
+  {
+   "fieldname": "height",
+   "fieldtype": "Float",
+   "label": "Height",
+   "non_negative": 1
   }
  ],
  "index_web_pages_for_search": 1,
+ "is_submittable": 1,
  "links": [
   {
    "link_doctype": "Item",
@@ -108,7 +156,7 @@
    "link_fieldname": "leasing_of"
   }
  ],
- "modified": "2024-08-27 19:25:30.612805",
+ "modified": "2024-09-10 16:31:47.548280",
  "modified_by": "Administrator",
  "module": "Airport Leasing",
  "name": "Room",

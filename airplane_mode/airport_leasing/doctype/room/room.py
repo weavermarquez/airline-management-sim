@@ -24,61 +24,90 @@ class Room(Document):
 		amended_from: DF.Link | None
 		area: DF.Int
 		capacity: DF.Int
+		entrances_and_exits: DF.Int
+		height: DF.Float
+		length: DF.Float
 		operated_by: DF.Link | None
+		rental_rate: DF.Int
 		room_number: DF.Int
 		status: DF.Literal["Vacant", "Leased", "Under maintenance"]
+		width: DF.Float
 	# end: auto-generated types
 	pass
 
-	def on_submit(self):
-		_create_item(self)
+	UOM = 'Week'
+	ITEM_GROUP = 'Real Estate Leasing'
 
-	def autoname(self):
-		self.name = self.room_name()
-
-	def room_name(self):
+	def autoname(self) -> str:
 		airport_code = frappe.get_value('Airport', self.airport, 'code')
-		return f"{airport_code}{self.room_number}"
+		room_name = f"{airport_code}{self.room_number}"
+		self.name = room_name()
+		return room_name
+
+	def validate(self):
+		# airport, room number, area, capacity
+		self.autofill_rental_rate()
+
+	def autofill_rental_rate(self) -> None:
+		"""Order of priority for rental rates, from most to least important:
+		1. Pre-existing, user-set rate
+		3. user-set rate in Airport Leasing Settings
+		4. default system rate in Airport Leasing Settings"""
+		# TODO Set default rental rate logic in Room as well
+
+		if self.rental_rate:
+			return
+
+		self.rental_rate = frappe.get_doc('Airport Leasing Settings').default_rental_rate
 
 
-@frappe.whitelist()
-def default_uom() -> str:
-	uom: str = frappe.db.get_single_value('Airport Leasing Settings', 'default_uom')
-	if not uom:
-		uom = 'Week'
-	return uom
+	def item_exists(self) -> bool:
+		return frappe.db.exists('Item', self.name)
 
+	def on_submit(self) -> None:
+		if not self.item_exists():
+			self.create_item()
+	
+	def create_item(self) -> None:
+		item: Item = frappe.new_doc('Item', 
+			item_code = self.name,
+			item_group = Room.ITEM_GROUP,
+			stock_uom = Room.UOM,
+			sales_uom = Room.UOM,
+			standard_rate = self.rental_rate,
+			is_stock_item = 0,
+			is_purchase_item = 0,
+			grant_commission = 0,
+			include_item_in_manufacturing = 0,
+		)
+		item.save()
+		self.notify_update()
+		frappe.msgprint(
+			msg='Item "%s" created and associated to this Room.' % (self.name),
+			title='Room Item Creation',
+			indicator='green')
+
+	# Not happy with this. TODO solve with Domain Driven Design.
+	def available(self) -> bool:
+		"""Room must be Vacant before adding to new Leases"""
+		from typing_extensions import assert_never
+		match self.status:
+			case 'Vacant':
+				return True
+			case 'Under maintenance' | 'Leased':
+				return False
+			case _:
+				assert_never(self.status)
+	
+	def on_update_after_submit(self) -> None:
+		# read only:
+		# item next date
+		# transactions
+		pass
 
 # TODO Fix the fragility of this function with try / except.
 @frappe.whitelist()
 def create_item(doc: str) -> None:
 	room: Room = frappe.get_doc(json.loads(doc))
-	return _create_item(room)
-
-def _create_item(room: Room) -> None:
-	rental_rate: int = frappe.get_doc('Airport Leasing Settings').default_rental_rate
-	# I need to use get_doc because get_single_value doesn't retrieve defaults.
-	item_code = room.room_name()
-	uom = default_uom()
-
-	item_group = 'Real Estate Leasing'
-	# TODO I should really add a field to the Airport Leasing Setttings about Units of Measurement.
-
-	item: Item = frappe.new_doc('Item', 
-		item_code = item_code,
-		item_group = item_group,
-		stock_uom = uom,
-		sales_uom = uom,
-		standard_rate = rental_rate,
-		is_stock_item = 0,
-		is_purchase_item = 0,
-		grant_commission = 0,
-		include_item_in_manufacturing = 0,
-	)
-
-	item.insert()
-
-	frappe.msgprint(
-		msg='Item "%s" created and associated to this Room.' % (item_code),
-		title='Room Item Creation',
-		indicator='green')
+	if not room.item_exists():
+		room.create_item()
