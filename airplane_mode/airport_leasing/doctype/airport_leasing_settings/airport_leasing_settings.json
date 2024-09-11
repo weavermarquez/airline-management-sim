@@ -6,7 +6,8 @@
  "engine": "InnoDB",
  "field_order": [
   "default_rental_rate",
-  "enable_payment_reminders"
+  "enable_payment_reminders",
+  "default_uom"
  ],
  "fields": [
   {
@@ -21,12 +22,19 @@
    "fieldname": "enable_payment_reminders",
    "fieldtype": "Check",
    "label": "Enable payment reminders"
+  },
+  {
+   "default": "Week",
+   "fieldname": "default_uom",
+   "fieldtype": "Select",
+   "label": "Default UoM",
+   "options": "Week\nMonth"
   }
  ],
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2024-08-26 22:17:43.996276",
+ "modified": "2024-08-31 03:12:45.781059",
  "modified_by": "Administrator",
  "module": "Airport Leasing",
  "name": "Airport Leasing Settings",

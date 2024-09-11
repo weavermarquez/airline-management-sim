@@ -15,6 +15,7 @@ class AirportLeasingSettings(Document):
 		from frappe.types import DF
 
 		default_rental_rate: DF.Int
+		default_uom: DF.Literal["Week", "Month"]
 		enable_payment_reminders: DF.Check
 	# end: auto-generated types
 	pass
