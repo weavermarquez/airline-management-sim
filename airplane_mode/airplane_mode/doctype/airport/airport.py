@@ -19,3 +19,12 @@ class Airport(Document):
 		country: DF.Data
 	# end: auto-generated types
 	pass
+
+	def uwu(self):
+		return "uwu"
+
+	def owo(self):
+		return "owo"
+
+	def awa(self):
+		return "awa"
