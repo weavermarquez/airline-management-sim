@@ -1,0 +1,30 @@
+{
+ "add_total_row": 0,
+ "columns": [],
+ "creation": "2024-09-04 13:19:36.685939",
+ "disabled": 0,
+ "docstatus": 0,
+ "doctype": "Report",
+ "filters": [],
+ "idx": 0,
+ "is_standard": "Yes",
+ "json": "{}",
+ "letterhead": null,
+ "modified": "2024-09-04 13:19:36.685939",
+ "modified_by": "Administrator",
+ "module": "Airport Leasing",
+ "name": "Lease Payments per Month",
+ "owner": "Administrator",
+ "prepared_report": 0,
+ "ref_doctype": "Payment Entry",
+ "report_name": "Lease Payments per Month",
+ "report_type": "Report Builder",
+ "roles": [
+  {
+   "role": "Accounts User"
+  },
+  {
+   "role": "Accounts Manager"
+  }
+ ]
+}
