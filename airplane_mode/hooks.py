@@ -122,11 +122,6 @@ app_license = "mit"
 # ---------------
 # Hook on document methods and events
 
-doc_events = {
-	"SalesOrder": {
-		"on_submit": "airplane_mode.airport_leasing.lease_sales_order.on_submit_sales_order",
-	},
-}
 # doc_events = {
 # 	"*": {
 # 		"on_update": "method",

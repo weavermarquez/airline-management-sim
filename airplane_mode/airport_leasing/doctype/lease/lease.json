@@ -1,21 +1,5 @@
 {
- "actions": [
-  {
-   "action": "airplane_mode.airport_leasing.doctype.lease.lease.create_repeating_sales_order",
-   "action_type": "Server Action",
-   "label": "Create Sales Order"
-  },
-  {
-   "action": "airplane_mode.airport_leasing.doctype.lease.lease.create_sales_invoice",
-   "action_type": "Server Action",
-   "label": "Create Sales Invoice"
-  },
-  {
-   "action": "airplane_mode.airport_leasing.doctype.lease.lease.create_owo",
-   "action_type": "Server Action",
-   "label": "Create OwO"
-  }
- ],
+ "actions": [],
  "allow_rename": 1,
  "autoname": "prompt",
  "creation": "2024-08-21 00:08:59.460362",
@@ -23,16 +7,24 @@
  "engine": "InnoDB",
  "field_order": [
   "section_break_dwck",
-  "leased_from",
-  "start_date",
-  "leasing_of",
   "column_break_xjpb",
-  "leased_to",
-  "end_date",
-  "invoice_frequency",
-  "section_break_voso",
   "amended_from",
+  "leasing_of",
+  "rental_rate",
+  "column_break_onqo",
+  "leased_from",
+  "leased_to",
+  "section_break_uvcn",
+  "start_date",
+  "invoice_frequency",
+  "column_break_ltes",
+  "end_date",
+  "tab_break_omsj",
+  "section_break_voso",
   "item",
+  "column_break_guos",
+  "next_date",
+  "section_break_jmgv",
   "transactions"
  ],
  "fields": [
@@ -68,6 +60,7 @@
    "in_list_view": 1,
    "label": "Leased From",
    "options": "Company",
+   "remember_last_selected_value": 1,
    "reqd": 1
   },
   {
@@ -99,27 +92,68 @@
   },
   {
    "fieldname": "section_break_voso",
-   "fieldtype": "Section Break",
-   "label": "References"
+   "fieldtype": "Section Break"
   },
   {
    "fieldname": "item",
    "fieldtype": "Link",
-   "label": "Item",
-   "options": "Item"
+   "label": "Link to Room Item",
+   "options": "Item",
+   "read_only": 1
   },
   {
    "allow_on_submit": 1,
    "fieldname": "transactions",
    "fieldtype": "Table",
    "label": "Transactions",
-   "options": "Lease Transaction"
+   "no_copy": 1,
+   "options": "Lease Transaction",
+   "read_only": 1
+  },
+  {
+   "fieldname": "rental_rate",
+   "fieldtype": "Int",
+   "label": "Rental Rate",
+   "non_negative": 1
+  },
+  {
+   "fieldname": "section_break_uvcn",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "column_break_ltes",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "tab_break_omsj",
+   "fieldtype": "Tab Break",
+   "label": "Transactions"
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "next_date",
+   "fieldtype": "Read Only",
+   "label": "Next Date",
+   "no_copy": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_guos",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "section_break_jmgv",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "column_break_onqo",
+   "fieldtype": "Column Break"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2024-08-30 01:31:46.022224",
+ "modified": "2024-09-10 03:56:10.835254",
  "modified_by": "Administrator",
  "module": "Airport Leasing",
  "name": "Lease",
