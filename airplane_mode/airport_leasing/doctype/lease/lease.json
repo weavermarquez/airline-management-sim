@@ -20,12 +20,13 @@
   "column_break_ltes",
   "end_date",
   "tab_break_omsj",
-  "section_break_voso",
-  "item",
-  "column_break_guos",
   "next_date",
-  "section_break_jmgv",
-  "transactions"
+  "sales_order",
+  "column_break_poir",
+  "outstanding_balance",
+  "section_break_xmrg",
+  "invoices",
+  "payments"
  ],
  "fields": [
   {
@@ -91,26 +92,6 @@
    "reqd": 1
   },
   {
-   "fieldname": "section_break_voso",
-   "fieldtype": "Section Break"
-  },
-  {
-   "fieldname": "item",
-   "fieldtype": "Link",
-   "label": "Link to Room Item",
-   "options": "Item",
-   "read_only": 1
-  },
-  {
-   "allow_on_submit": 1,
-   "fieldname": "transactions",
-   "fieldtype": "Table",
-   "label": "Transactions",
-   "no_copy": 1,
-   "options": "Lease Transaction",
-   "read_only": 1
-  },
-  {
    "fieldname": "rental_rate",
    "fieldtype": "Int",
    "label": "Rental Rate",
@@ -138,22 +119,48 @@
    "read_only": 1
   },
   {
-   "fieldname": "column_break_guos",
+   "fieldname": "column_break_onqo",
    "fieldtype": "Column Break"
   },
   {
-   "fieldname": "section_break_jmgv",
+   "fieldname": "column_break_poir",
+   "fieldtype": "Column Break"
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "outstanding_balance",
+   "fieldtype": "Currency",
+   "label": "Outstanding Balance",
+   "non_negative": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "section_break_xmrg",
    "fieldtype": "Section Break"
   },
   {
-   "fieldname": "column_break_onqo",
-   "fieldtype": "Column Break"
+   "fieldname": "invoices",
+   "fieldtype": "Table",
+   "label": "Invoices",
+   "options": "Lease Invoice"
+  },
+  {
+   "fieldname": "payments",
+   "fieldtype": "Table",
+   "label": "Payments",
+   "options": "Lease Payment"
+  },
+  {
+   "fieldname": "sales_order",
+   "fieldtype": "Link",
+   "label": "Sales Order",
+   "options": "Sales Order"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2024-09-10 03:56:10.835254",
+ "modified": "2024-10-16 14:57:27.720644",
  "modified_by": "Administrator",
  "module": "Airport Leasing",
  "name": "Lease",

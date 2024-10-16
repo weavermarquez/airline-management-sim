@@ -6,17 +6,22 @@ import json
 from frappe.model.document import Document
 
 from airplane_mode.airport_leasing.doctype.room.room import Room
+from frappe.types import DF
 
-from erpnext.selling.doctype.sales_order.sales_order import ( make_sales_invoice, SalesOrder )
+from erpnext.selling.doctype.sales_order.sales_order import SalesOrder
 from erpnext.accounts.doctype.sales_invoice.sales_invoice import SalesInvoice
-from erpnext.accounts.doctype.payment_entry.payment_entry import ( get_payment_entry, PaymentEntry )
+from erpnext.accounts.doctype.payment_entry.payment_entry import PaymentEntry
+
+from airplane_mode.airport_leasing.doctype.lease_invoice.lease_invoice import LeaseInvoice
+from airplane_mode.airport_leasing.doctype.lease_payment.lease_payment import LeasePayment
 
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
 	from frappe.types import DF
 	from frappe.model.docstatus import DocStatus
-	pass
+	from airplane_mode.airport_leasing.doctype.lease_transaction.lease_transaction import LeaseTransaction
+	from erpnext.selling.doctype.sales_order_item.sales_order_item import SalesOrderItem
 
 class Lease(Document):
 	# begin: auto-generated types
@@ -25,55 +30,37 @@ class Lease(Document):
 	from typing import TYPE_CHECKING
 
 	if TYPE_CHECKING:
-		from airplane_mode.airport_leasing.doctype.lease_transaction.lease_transaction import LeaseTransaction
+		from airplane_mode.airport_leasing.doctype.lease_invoice.lease_invoice import LeaseInvoice
+		from airplane_mode.airport_leasing.doctype.lease_payment.lease_payment import LeasePayment
 		from frappe.types import DF
 
 		amended_from: DF.Link | None
 		end_date: DF.Date
 		invoice_frequency: DF.Literal["Monthly", "Quarterly"]
-		item: DF.Link | None
+		invoices: DF.Table[LeaseInvoice]
 		leased_from: DF.Link
 		leased_to: DF.Link
 		leasing_of: DF.Link
 		next_date: DF.ReadOnly | None
+		outstanding_balance: DF.Currency
+		payments: DF.Table[LeasePayment]
 		rental_rate: DF.Int
+		sales_order: DF.Link | None
 		start_date: DF.Date
-		transactions: DF.Table[LeaseTransaction]
 	# end: auto-generated types
 	pass
 
-	UOM = 'Week'
+	# TODO Probably add a function for server side validation to ensure that 
+	# Lease Transactions cannot be deleted.
 
-	def frequency_in_days(self) -> int:
-		return 30 * self.frequency_in_months()
-
-	def frequency_in_weeks(self) -> int:
-		return 4 * self.frequency_in_months()
-
-	def frequency_in_months(self) -> int:
-		"""Comprehensively converts invoice_frequency to month durations."""
-		from typing_extensions import assert_never
-		match self.invoice_frequency:
-			case 'Monthly':
-				return 1
-			case 'Quarterly':
-				return 3
-			case _:
-				assert_never(self.invoice_frequency)
-
-	def frequency_payment_template(self) -> str:
-		template = f"Airport {self.invoice_frequency}"
-		if not frappe.db.exists('Payment Terms Template', template):
-			frappe.throw('Airport Leasing fixtures for Payment Terms Templates are missing.')
-		return template
-
+	# ==================== 
+	# CONTROLLERS 
+	# ====================
 
 	def validate(self) -> None:
-		# leasing_of
 		def room_submitted() -> bool:
 			"""The room being leased out should be finalized and submitted"""
 			return room.docstatus.is_submitted()
-			# return frappe.get_value('Room', self.leasing_of, 'docstatus') == DocStatus.is_submitted()
 
 		def room_available() -> bool:
 			"""Room must be vacant when adding to any new leases."""
@@ -86,151 +73,230 @@ class Lease(Document):
 		def minimum_one_period() -> bool:
 			"""Duration of lease should be at least 1 period. 
 			Please choose a start date later than {minimum_end}"""
-			minimum_end = frappe.utils.add_months(self.start_date, self.frequency_in_months())
+			minimum_end = frappe.utils.add_to_date(self.start_date, weeks=self.get_frequency())
 			return minimum_end <= self.end_date
 
+		# TODO Fix use dynamic docstrings.
 		def backdated_recently() -> bool:
 			"""If start date is backdated, earliest permitted date is within one period before today.
 			Please choose an end date later than {earliest_backdate}"""
-			# earliest_backdate = frappe.utils.add_months(frappe.utils.today(), -self.frequency_in_months())
+			earliest_backdate = frappe.utils.add_to_date(frappe.utils.today(), weeks=-self.get_frequency())
 			return earliest_backdate < self.start_date
-			# NOTE Damn, docstrings can't be f-strings. This is one downside.
 
+		# self.autofill_rental_rate()
 		room: Room = frappe.get_doc('Room', self.leasing_of)
-		preconditions = [room_submitted, room_available, chronological_dates, minimum_one_period]
+		preconditions = [room_submitted, room_available, chronological_dates, minimum_one_period, backdated_recently]
 		for pc in preconditions:
 			if not pc():
 				frappe.throw(pc.__doc__)
 
-
-		earliest_backdate = frappe.utils.add_months(frappe.utils.today(), -self.frequency_in_months())
-		if not backdated_recently():
-			frappe.throw(f"{backdated_recently.__doc__}\nChoose a date later than {earliest_backdate}")
-		# self.autofill_rental_rate()
-
-		# leased_to a Shop, which has a Customer
-		# leased_from a Company
-
-	# def autofill_rental_rate(self) -> None:
-	# 	"""When a Sales Order is created, the price is determined by this 
-	# 	order of priority for rental rates, from most to least important:
-	# 	1. Pre-existing or user-set rate
-	# 	2. user-set rate in Room
-	# 	3. user-set rate in Airport Leasing Settings
-	# 	4. default system rate in Airport Leasing Settings"""
-	# 	# TODO Set default rental rate logic in Room as well
-
-	# 	if self.rental_rate:
-	# 		return
-
-	# 	new_rate = frappe.get_doc('Airport Leasing Settings').default_rental_rate
-
-	# 	room_rental_rate = frappe.get_value('Room', self.leasing_of, 'default_rental_rate')
-	# 	if room_rental_rate:
-	# 		new_rate = room_rental_rate
-
-	# 	self.rental_rate = new_rate
-
+	# TODO Investigate if this is correct.
 	def before_submit(self) -> None:
-		self.next_date = self.start_date
+		"""While finalizing Lease, create a Sales Order and recurring Sales Invoice"""
+		self.set_sales_order()
+		self.append_sales_invoice()
+
+		# self.set_next_date(self.start_date)
+		# Hmm? What does this do?
 		# postdated, must wait until next_date to create a transaction.
+		# else post-dated
+		# TODO Set Room availability to Leased
 
 	def on_submit(self) -> None:
-		# TODO Set Room availability to Leased
-		if self.start_date <= frappe.utils.today():  # back-dated or today
-			# we must explicitly invoke create_lease_transaction() so next_date is in future
-			self.create_lease_transaction()
-		self.create_lease_transaction()
-		# TODO Remove this later
-		# else post-dated
+		pass
 
 	def on_update_after_submit(self) -> None:
-		def last_period() -> bool:
-			return self.next_date > self.end_date
+		pass
+		# def last_period() -> bool:
+		# 	return self.next_date > self.end_date
 
-		if last_period():
-			return
+		# if last_period():
+		# 	return
 		# read only:
 		# item, next_date
 		# transactions
 
-	def create_lease_transaction(self) -> None:
-		frappe.errprint('Wal: creating Sales Order~')
-		so = self.create_submit_sales_order()
+	# ==================== 
+	# PUBLIC INSTANCE METHODS
+	# ====================
 
-		frappe.errprint('Wal: creating Sales Invoice~')
-		si = self.create_submit_sales_invoice(so)
-		# pe = self.create_save_payment_entry(si)
-		pe = None
-		# self.run_notifications()
+	def set_next_date(self, date: DF.Date) -> None:
+		self.next_date = date
 
-		frappe.errprint('Wal: Appending to transactions~')
-		self.save_append_to_transactions(so, si, pe)
-		self.save_move_next_date()
-		self.notify_update()
-
-		frappe.msgprint(
-			msg='Lease Transaction created. Ready for payment. Next transaction on %s.' % (self.next_date),
-			title='Lease Transaction Finalized',
-			indicator='green')
-	
-	def create_submit_sales_order(self) -> SalesOrder:
+	# TODO Issue #7
+	def set_sales_order(self) -> None:
 		customer: str = frappe.get_value('Shop', self.leased_to, 'owned_by')
-		# payment_terms_template = arst,
+		company = self.leased_from 
+		
+		item = Lease.new_item(self.room, self.start_date, self.end_date)
+		self.sales_order = Lease.new_sales_order(item, company, customer)
 
+
+	def append_sales_invoice(self) -> None:
+		sales_invoice = Lease.new_sales_invoice(self.sales_order)
+		self.invoices.append(sales_invoice)
+
+
+	def append_payment_entry(self) -> None:
+		payment_entry = Lease.new_payment_entry(self)
+		self.payments.append(payment_entry)
+
+
+	# TODO Set default rental rate logic in Room as well
+	def autofill_rental_rate(self) -> None:
+		"""When a Sales Order is created, the price is determined by this 
+		order of priority for rental rates, from most to least important:
+		1. Pre-existing or user-set rate
+		2. user-set rate in Room
+		3. user-set rate in Airport Leasing Settings
+		4. default system rate in Airport Leasing Settings"""
+
+		if self.rental_rate:
+			return
+
+		new_rate = frappe.get_doc('Airport Leasing Settings').default_rental_rate
+
+		room_rental_rate = frappe.get_value('Room', self.leasing_of, 'default_rental_rate')
+		if room_rental_rate:
+			new_rate = room_rental_rate
+
+		self.rental_rate = new_rate
+
+	def get_frequency(self) -> int:
+		"""Get number of weeks for this lease's invoice frequency."""
+		return Lease.period_weeks(self.invoice_frequency)
+
+
+	def latest_invoice(self) -> SalesInvoice:
+		"""Return most recent Sales Invoice"""
+		return frappe.get_doc('Sales Invoice', self.invoices[-1].invoice)
+
+
+	# def frequency_payment_template(self) -> str:
+	# 	template = f"Airport {self.invoice_frequency}"
+	# 	if not frappe.db.exists('Payment Terms Template', template):
+	# 		frappe.throw('Airport Leasing fixtures for Payment Terms Templates are missing.')
+	# 	return template
+
+
+	# def create_rent_reminder(self):
+	# 	pass
+
+
+	# def save_move_next_date(self) -> None:
+	# 	def last_period() -> bool:
+	# 		return self.next_date > self.end_date
+		
+	# 	months = self.frequency_in_months()
+	# 	# self.set('next_date', frappe.utils.add_months(self.next_date, months))
+	# 	self.next_date = frappe.utils.add_months(self.next_date, months)
+	# 	# scope when declared; value when evaluated
+
+	# 	# If next_date is after end_date, add a special warning?
+
+	# 	if last_period():
+	# 		return
+	# 	self.save()
+	# 	self.notify_update()
+
+
+	# ==================== 
+	# STATIC METHODS
+	# ====================
+	@staticmethod
+	def period_weeks(invoice_frequency: str) -> int:
+		"""Convert invoice_frequency to number of weeks."""
+		from typing_extensions import assert_never
+		match invoice_frequency:
+			case 'Monthly':
+				return 4
+			case 'Quarterly':
+				return 12
+			case _:
+				assert_never(invoice_frequency)
+
+
+	@staticmethod
+	def new_item(room: str, start_date: DF.Date, end_date: DF.Date) -> SalesOrderItem:
 		item = frappe.new_doc("Sales Order Item",
-					item_code = self.leasing_of,
-					delivery_date = self.next_date,
-					qty = self.frequency_in_weeks(),
+					item_code = room,
+					delivery_date = start_date,
+					qty = Lease.duration_weeks(start_date, end_date),
 					uom = Room.UOM)
+		return item
+
+
+	@staticmethod
+	def total_weeks(start_date: DF.Date, end_date: DF.Date) -> float:
+		days = frappe.utils.date_diff(end_date, start_date)
+		return days / 7	
+
+
+	@staticmethod
+	def new_sales_order(item: SalesOrderItem, company: str, customer: str) -> SalesOrder:
+		"""Create a new Sales Order representing the entire duration of the Lease."""
+		from airplane_mode.airport_leasing.doctype.room.room import Room
 
 		sales_order: SalesOrder = frappe.new_doc('Sales Order', 
 			customer = customer,
-			company = self.leased_from,
-			transaction_date = self.next_date,
-			payment_terms_template = self.frequency_payment_template(),
+			company = company,
+			transaction_date = frappe.utils.today(),
 			items = [ item ],
-						# TODO I think I need to manually set the price for this thing?
+			# TODO I think I need to manually set the price for this thing?
 		)
-		return sales_order.submit()
+		return sales_order
 
-	def create_submit_sales_invoice(self, so: SalesOrder) -> SalesInvoice:
-		si: SalesInvoice = make_sales_invoice(so.name)  # needs so.docstatus == 1
-		return si.submit()
 
-	def create_save_payment_entry(self, si: SalesInvoice) -> PaymentEntry:
-		pe: PaymentEntry = get_payment_entry('Sales Invoice', si.name)  # needs si.docstatus == 1
-		return pe.save()
+	@staticmethod
+	def new_sales_invoice(sales_order: str) -> SalesInvoice:
+		from erpnext.selling.doctype.sales_order.sales_order import make_sales_invoice
+		# TODO Confirm if it needs so.docstatus == 1
+		return make_sales_invoice(sales_order)  # needs so.docstatus == 1
 
-	def create_rent_reminder(self):
-		pass
+	@staticmethod
+	def new_payment_entry(lease: 'Lease', amount: float) -> PaymentEntry:
+		"""Associate the newly user-created Payment Entry to a Lease Transaction"""
+		from erpnext.accounts.doctype.payment_entry.payment_entry import get_payment_entry 
 
-	def save_append_to_transactions(self, so: SalesOrder, si: SalesInvoice, 
-								 pe: PaymentEntry = None) -> None:
-		self.append('transactions',
-			  frappe.new_doc('Lease Transaction',
-					sales_order = so, 
-					sales_invoice = si, 
-					payment_entry = pe,
-			  )
+		sales_invoice = lease.latest_invoice()
+		payment_entry: PaymentEntry = get_payment_entry('Sales Invoice', 
+												  sales_invoice.name, 
+												  party_amount=amount, 
+												  reference_no = '23324', # TODO Fix Magic Number
+												  reference_date=frappe.utils.today())
+		return payment_entry
+		# from erpnext.accounts.doctype.journal_entry.journal_entry import get_payment_entry_against_invoice
+		# payment_entry: PaymentEntry = get_payment_entry_against_invoice('Sales Invoice', sales_invoice.name, amount)
+
+
+
+@frappe.whitelist()
+@frappe.validate_and_sanitize_search_inputs
+def get_filtered_child_rows(doctype, txt, searchfield, start, page_len, filters) -> list:
+	"""Meant to be called by lease.js. Queries Invoices."""
+	table = frappe.qb.DocType(doctype)
+	query = (
+		frappe.qb.from_(table)
+		.select(
+			table.name,
+			# Concat("#", table.idx, ", ", table.item_code),
 		)
-		self.save()
+		# .orderby(table.idx)
+		.offset(start)
+		.limit(page_len)
+	)
 
-	def save_move_next_date(self) -> None:
-		def last_period() -> bool:
-			return self.next_date > self.end_date
-		
-		months = self.frequency_in_months()
-		# self.set('next_date', frappe.utils.add_months(self.next_date, months))
-		self.next_date = frappe.utils.add_months(self.next_date, months)
-		# scope when declared; value when evaluated
+	if filters:
+		for field, value in filters.items():
+			query = query.where(table[field] == value)
 
-		# If next_date is after end_date, add a special warning?
+	# if txt:
+	# 	txt += "%"
+	# 	query = query.where(
+	# 		((table.idx.like(txt.replace("#", ""))) | (table.item_code.like(txt))) | (table.name.like(txt))
+	# 	)
 
-		if last_period():
-			return
-		self.save()
-		self.notify_update()
+	return query.run(as_dict=False)
 
 
 @frappe.whitelist()
