@@ -1,7 +1,7 @@
 # Copyright (c) 2024, Weaver Marquez and contributors
 # For license information, please see license.txt
 
-# import frappe
+import frappe
 from frappe.model.document import Document
 
 
@@ -21,3 +21,14 @@ class LeasePayment(Document):
 		payment_entry: DF.Link | None
 	# end: auto-generated types
 	pass
+
+	def validate(self) -> None:
+		"""Submit the Payment Entry if not submitted."""
+		if not self.payment_entry:
+			record = frappe.get_doc(self.payment_entry)
+			if not record.docstatus.is_submitted():
+				record.submit()
+
+	# TODO Better Throw Message.
+	def on_trash(self) -> None:
+		frappe.throw("Cannot delete Lease Payments.")

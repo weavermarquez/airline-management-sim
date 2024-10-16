@@ -6,26 +6,26 @@
  "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
-  "date",
-  "invoice"
+  "invoice_date",
+  "sales_invoice"
  ],
  "fields": [
   {
-   "fieldname": "date",
+   "fieldname": "invoice_date",
    "fieldtype": "Date",
-   "label": "Date"
+   "label": "Invoice Date"
   },
   {
-   "fieldname": "invoice",
+   "fieldname": "sales_invoice",
    "fieldtype": "Link",
-   "label": "Invoice",
+   "label": "Sales Invoice",
    "options": "Sales Invoice"
   }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2024-10-16 14:45:52.793258",
+ "modified": "2024-10-16 15:47:19.012893",
  "modified_by": "Administrator",
  "module": "Airport Leasing",
  "name": "Lease Invoice",
