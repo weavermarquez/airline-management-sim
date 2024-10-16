@@ -41,7 +41,7 @@ class Room(Document):
 	def autoname(self) -> str:
 		airport_code = frappe.get_value('Airport', self.airport, 'code')
 		room_name = f"{airport_code}{self.room_number}"
-		self.name = room_name()
+		self.name = room_name
 		return room_name
 
 	def validate(self):
