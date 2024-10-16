@@ -4,8 +4,8 @@
 frappe.ui.form.on("Airplane Ticket", {
 	refresh(frm) {
         // Custom buttons
-        frm.add_custom_button('Assign Seat', () => {
-            frappe.prompt('Seat Number', ({ value }) => frm.set_value('seat', value), 'Select Seat', 'Assign');
+        frm.add_custom_button(_('Assign Seat'), () => {
+            frappe.prompt(_('Seat Number'), ({ value }) => frm.set_value('seat', value), _('Select Seat'), _('Assign'));
         }, 'Actions');
 	},
 });

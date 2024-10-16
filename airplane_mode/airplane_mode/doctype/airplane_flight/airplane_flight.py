@@ -74,7 +74,7 @@ class AirplaneFlight(WebsiteGenerator):
 		# But, for a ticket to be submitted, it needs to be Boarded? So it probably shouldn't be able to be edited after boarding...
 
 
-	def on_submit(self):
+	def before_submit(self):
 		self.status = 'Completed'
 		pass
 
