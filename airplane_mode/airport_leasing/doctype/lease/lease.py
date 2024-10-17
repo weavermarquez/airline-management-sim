@@ -1,27 +1,10 @@
 # Copyright (c) 2024, Weaver Marquez and contributors
 # For license information, please see license.txt
 
+from __future__ import annotations
 import frappe
 import json
 from frappe.model.document import Document
-
-from airplane_mode.airport_leasing.doctype.room.room import Room
-from frappe.types import DF
-
-from erpnext.selling.doctype.sales_order.sales_order import SalesOrder
-from erpnext.accounts.doctype.sales_invoice.sales_invoice import SalesInvoice
-from erpnext.accounts.doctype.payment_entry.payment_entry import PaymentEntry
-
-from airplane_mode.airport_leasing.doctype.lease_invoice.lease_invoice import LeaseInvoice
-from airplane_mode.airport_leasing.doctype.lease_payment.lease_payment import LeasePayment
-
-from typing import TYPE_CHECKING
-
-if TYPE_CHECKING:
-	from frappe.types import DF
-	from frappe.model.docstatus import DocStatus
-	from airplane_mode.airport_leasing.doctype.lease_transaction.lease_transaction import LeaseTransaction
-	from erpnext.selling.doctype.sales_order_item.sales_order_item import SalesOrderItem
 
 class Lease(Document):
 	# begin: auto-generated types
@@ -30,25 +13,26 @@ class Lease(Document):
 	from typing import TYPE_CHECKING
 
 	if TYPE_CHECKING:
-		from airplane_mode.airport_leasing.doctype.lease_invoice.lease_invoice import LeaseInvoice
 		from airplane_mode.airport_leasing.doctype.lease_payment.lease_payment import LeasePayment
+		from airplane_mode.airport_leasing.doctype.lease_period.lease_period import LeasePeriod
 		from frappe.types import DF
 
 		amended_from: DF.Link | None
 		end_date: DF.Date
-		invoice_frequency: DF.Literal["Monthly", "Quarterly"]
-		invoices: DF.Table[LeaseInvoice]
 		leased_from: DF.Link
 		leased_to: DF.Link
 		leasing_of: DF.Link
 		next_date: DF.ReadOnly | None
 		outstanding_balance: DF.Currency
 		payments: DF.Table[LeasePayment]
+		periods: DF.Table[LeasePeriod]
+		period_length: DF.Literal["Monthly", "Quarterly"]
 		rental_rate: DF.Int
 		sales_order: DF.Link | None
 		start_date: DF.Date
 	# end: auto-generated types
-	pass
+		from airplane_mode.airport_leasing.doctype.room.room import Room
+		from erpnext.accounts.doctype.payment_entry.payment_entry import PaymentEntry
 
 	# TODO Probably add a function for server side validation to ensure that 
 	# Lease Transactions cannot be deleted.
