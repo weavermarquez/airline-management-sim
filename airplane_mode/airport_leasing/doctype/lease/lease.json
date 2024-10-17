@@ -16,16 +16,15 @@
   "leased_to",
   "section_break_uvcn",
   "start_date",
-  "invoice_frequency",
+  "period_length",
   "column_break_ltes",
   "end_date",
   "tab_break_omsj",
   "next_date",
-  "sales_order",
   "column_break_poir",
   "outstanding_balance",
   "section_break_xmrg",
-  "invoices",
+  "periods",
   "payments"
  ],
  "fields": [
@@ -84,14 +83,6 @@
    "fieldtype": "Column Break"
   },
   {
-   "default": "Monthly",
-   "fieldname": "invoice_frequency",
-   "fieldtype": "Select",
-   "label": "Invoice Frequency",
-   "options": "Monthly\nQuarterly",
-   "reqd": 1
-  },
-  {
    "fieldname": "rental_rate",
    "fieldtype": "Int",
    "label": "Rental Rate",
@@ -139,28 +130,30 @@
    "fieldtype": "Section Break"
   },
   {
-   "fieldname": "invoices",
-   "fieldtype": "Table",
-   "label": "Invoices",
-   "options": "Lease Invoice"
-  },
-  {
    "fieldname": "payments",
    "fieldtype": "Table",
    "label": "Payments",
    "options": "Lease Payment"
   },
   {
-   "fieldname": "sales_order",
-   "fieldtype": "Link",
-   "label": "Sales Order",
-   "options": "Sales Order"
+   "default": "Monthly",
+   "fieldname": "period_length",
+   "fieldtype": "Select",
+   "label": "Period Length",
+   "options": "Monthly\nQuarterly",
+   "reqd": 1
+  },
+  {
+   "fieldname": "periods",
+   "fieldtype": "Table",
+   "label": "Periods",
+   "options": "Lease Period"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2024-10-16 14:57:27.720644",
+ "modified": "2024-10-17 14:51:18.746035",
  "modified_by": "Administrator",
  "module": "Airport Leasing",
  "name": "Lease",
