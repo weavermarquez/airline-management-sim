@@ -1,6 +1,7 @@
 # Copyright (c) 2024, Weaver Marquez and contributors
 # For license information, please see license.txt
 
+from __future__ import annotations
 import frappe
 from frappe.model.document import Document
 
@@ -28,10 +29,6 @@ class LeasePeriod(Document):
 		record = frappe.get_doc(self.invoice)
 		if not record.docstatus.is_submitted():
 			record.submit()
-
-	# TODO Better Throw Message.
-	def on_trash(self) -> None:
-		frappe.throw("Cannot delete Lease Periods.")
 
 
 	# ==================== 
@@ -65,18 +62,18 @@ class LeasePeriod(Document):
 				last_period = lease.latest_period()
 				return frappe.utils.add_days(last_period.end_date, 1)
 
-		def get_period_end_date(lease_end):
+		def get_period_end_date():
 			"""
 			End date:
 			- calculated based on the lease's period length (e.g., monthly, quarterly),
 			- cannot exceed the lease's end date.
 			"""
 			end = frappe.utils.add_to_date(period_start_date, weeks=period_duration)
-			return min(end, lease_end)
+			return min(end, lease.end_date)
 
-		room = lease.leasing_of
-		company = lease.leased_from
-		customer = lease.leased_to
+		room: str = lease.leasing_of
+		company: str = lease.leased_from
+		customer: str = frappe.get_value('Shop', lease.leased_to, 'owned_by')
 
 		period_start_date = get_period_start_date()
 		period_duration = lease.period_weeks()
@@ -88,14 +85,15 @@ class LeasePeriod(Document):
 		lease_period = frappe.new_doc('Lease Period',
 								start_date = period_start_date,
 								end_date = period_end_date, 
-								invoice = invoice)
+								invoice = invoice.name)
+		return lease_period
 
 
 	@staticmethod
-	def new_invoice_item(room: str, start_date: DF.Date, weeks: float) -> SalesInvoiceItem:
+	def new_invoice_item(room: str, start_date: 'DF.Date', weeks: float) -> SalesInvoiceItem:
 		"""Allocate the Room for the Period's duration"""
 		from airplane_mode.airport_leasing.doctype.room.room import Room
-		item = frappe.new_doc("Sales Order Item",
+		item = frappe.new_doc("Sales Invoice Item",
 					item_code = room,
 					delivery_date = start_date,
 					qty = weeks,
@@ -107,11 +105,15 @@ class LeasePeriod(Document):
 	@staticmethod
 	def new_sales_invoice(item: SalesInvoiceItem, company: str, customer: str) -> SalesInvoice:
 		"""Bill customer for upcoming period"""
+		# TODO The due_date gives 2wk buffer after first period
+		# But is due on the day the next period begins.
 		sales_invoice: SalesInvoice = frappe.new_doc('Sales Invoice', 
 			customer = customer,
 			company = company,
-			transaction_date = frappe.utils.today(),
+			posting_date = frappe.utils.today(),
+			due_date = frappe.utils.add_days(frappe.utils.today(), 14),
 			items = [ item ],
 		)
-		return sales_invoice
+		return sales_invoice.submit()
 
+		# Does customer need Payment Terms set up?

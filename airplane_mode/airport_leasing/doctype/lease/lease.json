@@ -24,7 +24,9 @@
   "column_break_poir",
   "outstanding_balance",
   "section_break_xmrg",
+  "total_owing",
   "periods",
+  "total_paid",
   "payments"
  ],
  "fields": [
@@ -105,7 +107,7 @@
    "allow_on_submit": 1,
    "fieldname": "next_date",
    "fieldtype": "Read Only",
-   "label": "Next Date",
+   "label": "Next Invoice Date",
    "no_copy": 1,
    "read_only": 1
   },
@@ -121,6 +123,7 @@
    "allow_on_submit": 1,
    "fieldname": "outstanding_balance",
    "fieldtype": "Currency",
+   "is_virtual": 1,
    "label": "Outstanding Balance",
    "non_negative": 1,
    "read_only": 1
@@ -130,9 +133,11 @@
    "fieldtype": "Section Break"
   },
   {
+   "allow_on_submit": 1,
    "fieldname": "payments",
    "fieldtype": "Table",
    "label": "Payments",
+   "no_copy": 1,
    "options": "Lease Payment"
   },
   {
@@ -144,16 +149,36 @@
    "reqd": 1
   },
   {
+   "allow_on_submit": 1,
    "fieldname": "periods",
    "fieldtype": "Table",
    "label": "Periods",
+   "no_copy": 1,
    "options": "Lease Period"
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "total_owing",
+   "fieldtype": "Currency",
+   "is_virtual": 1,
+   "label": "Total Owing",
+   "non_negative": 1,
+   "read_only": 1
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "total_paid",
+   "fieldtype": "Currency",
+   "is_virtual": 1,
+   "label": "Total Paid",
+   "non_negative": 1,
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2024-10-17 14:51:18.746035",
+ "modified": "2024-10-18 16:23:18.684280",
  "modified_by": "Administrator",
  "module": "Airport Leasing",
  "name": "Lease",

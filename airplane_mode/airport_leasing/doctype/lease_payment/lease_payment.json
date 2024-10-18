@@ -11,6 +11,8 @@
  ],
  "fields": [
   {
+   "fetch_from": "payment_entry.posting_date",
+   "fetch_if_empty": 1,
    "fieldname": "payment_date",
    "fieldtype": "Date",
    "label": "Payment Date"
@@ -25,7 +27,7 @@
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2024-10-16 14:44:50.198706",
+ "modified": "2024-10-18 15:45:04.541551",
  "modified_by": "Administrator",
  "module": "Airport Leasing",
  "name": "Lease Payment",

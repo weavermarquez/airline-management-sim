@@ -25,17 +25,15 @@ class Lease(Document):
 		next_date: DF.ReadOnly | None
 		outstanding_balance: DF.Currency
 		payments: DF.Table[LeasePayment]
-		periods: DF.Table[LeasePeriod]
 		period_length: DF.Literal["Monthly", "Quarterly"]
+		periods: DF.Table[LeasePeriod]
 		rental_rate: DF.Int
-		sales_order: DF.Link | None
 		start_date: DF.Date
+		total_owing: DF.Currency
+		total_paid: DF.Currency
 	# end: auto-generated types
 		from airplane_mode.airport_leasing.doctype.room.room import Room
 		from erpnext.accounts.doctype.payment_entry.payment_entry import PaymentEntry
-
-	# TODO Probably add a function for server side validation to ensure that 
-	# Lease Transactions cannot be deleted.
 
 	# ==================== 
 	# CONTROLLERS 
@@ -74,39 +72,88 @@ class Lease(Document):
 			if not pc():
 				frappe.throw(pc.__doc__)
 
-	# TODO Investigate if this is correct.
 	def before_submit(self) -> None:
 		"""Upon finalizing Lease, start the first Lease Period"""
 		self.next_period()
-
-		# self.set_next_date(self.start_date)
 		# TODO Set Room availability to Leased
 
-	def on_submit(self) -> None:
-		pass
+	@property
+	def total_owing(self) -> DF.Currency:
+		periods = self.get_all_children('Lease Period')
+		total_owing = sum(frappe.get_cached_value('Sales Invoice', 
+							  period.invoice, 'grand_total') 
+							  for period in periods if period.invoice)
+		
+		return total_owing
 
-	def on_update_after_submit(self) -> None:
-		pass
+	@property
+	def total_paid(self) -> DF.Currency:
+		payments = self.get_all_children('Lease Payment')
+		total_paid = sum(frappe.get_cached_value('Payment Entry', 
+							  payment.payment_entry, 'paid_amount') 
+							  for payment in payments if payment.payment_entry)
+		return total_paid
+
+	@property
+	def outstanding_balance(self):
+		return self.total_owing - self.total_paid
 
 	# ==================== 
 	# PUBLIC INSTANCE METHODS
 	# ====================
+	def next_period(self) -> None:
+		"""At the end of this period, another period will begin."""
+		from airplane_mode.airport_leasing.doctype.lease_period.lease_period import LeasePeriod
+		next_period = LeasePeriod.next_period(self)
+		self.append('periods', next_period)
+		self.next_date = Lease.next_renew_date(self)
+		# self.save()
+		# This will cause the "Saved after opening Error.""
+
+
+	def offboard() -> None:
+		"""The current period will end at lease end. Begin offboarding."""
+		pass
+
+
+	def period_weeks(self) -> int:
+		"""Get number of weeks for this lease's period length."""
+		from typing_extensions import assert_never
+		match self.period_length:
+			case 'Monthly':
+				return 4
+			case 'Quarterly':
+				return 12
+			case _:
+				assert_never(self.period_length)
+
+
+	def latest_period(self) -> LeasePeriod:
+		"""Return most recent Period based on latest start date"""
+		if not self.periods:
+			return None
+		return max(self.periods, key=lambda period: period.start_date)
+
+
+	def remind_tenant(self):
+		pass
 
 	@frappe.whitelist()
-	def update_transactions_on_next_date(doc: str) -> None:
-		lease: Lease = frappe.get_doc(json.loads(doc))
+	def receive_payment(self, amount: DF.Currency, reference_no: DF.Data):
+		"""When the tenant pays up on the Lease page, create a new Lease Payment."""
+		from airplane_mode.airport_leasing.doctype.lease_payment.lease_payment import LeasePayment
+		lease_payment = LeasePayment.new_payment(self, amount, reference_no)
+		self.append('payments', lease_payment)
+		self.save()
 
-		def triggers_today() -> bool:
-			return lease.next_date == frappe.utils.today()
-		def ends_today() -> bool:
-			return lease.end_date == frappe.utils.today()
-			
-		if lease.docstatus.is_submitted() and triggers_today():
-			lease.create_lease_transaction()
+	# ==================== 
+	# STATIC METHODS
+	# ====================
 
-		# TODO Figure out what to do once the Lease ends.
-		# if ends_today():
-		# 	lease.cancel()
+	@staticmethod
+	def total_weeks(start_date: DF.Date, end_date: DF.Date) -> float:
+		days = frappe.utils.date_diff(end_date, start_date)
+		return days / 7	
 
 	@staticmethod
 	def autorenew(doc: str) -> None:
@@ -120,6 +167,7 @@ class Lease(Document):
 		
 		# TODO unpaid deposit.
 		unpaid = False
+		# TODO New boolean variable to see if it has already been offboarded?
 		expiring_soon = Lease.calculate_renewal_buffer(lease.end_date) <= today
 		if expiring_soon:
 			return lease.offboard()
@@ -127,78 +175,13 @@ class Lease(Document):
 			lease.next_period()
 
 
-	def next_period(self) -> None:
-		"""At the end of this period, another period will begin."""
-		from airplane_mode.airport_leasing.doctype.lease_period.lease_period import LeasePeriod
-		next_period = LeasePeriod.next_period(self)
-		self.append('periods', next_period)
-		self.next_date = Lease.next_renew_date(self)
-		self.save()
-
-
-	def offboard() -> None:
-		"""The current period will end at lease end. Begin offboarding."""
-		pass
-
-
-	def period_weeks(self) -> int:
-		"""Get number of weeks for this lease's period length."""
-		return Lease.period_weeks(self.period_length)
-
-
-	def latest_period(self) -> LeasePeriod:
-		"""Return most recent Period based on latest start date"""
-		if not self.periods:
-			return None
-		return max(self.periods, key=lambda period: period.start_date)
-
-
-	def remind_tenant(self):
-		pass
-
-	# ==================== 
-	# STATIC METHODS
-	# ====================
-	@staticmethod
-	def period_weeks(period_length: str) -> int:
-		"""Convert period_length to number of weeks."""
-		from typing_extensions import assert_never
-		match period_length:
-			case 'Monthly':
-				return 4
-			case 'Quarterly':
-				return 12
-			case _:
-				assert_never(period_length)
-
-
-	@staticmethod
-	def total_weeks(start_date: DF.Date, end_date: DF.Date) -> float:
-		days = frappe.utils.date_diff(end_date, start_date)
-		return days / 7	
-
-
-	@staticmethod
-	def new_payment_entry(lease: 'Lease', amount: float) -> PaymentEntry:
-		"""Associate the newly user-created Payment Entry to a Lease Transaction"""
-		from erpnext.accounts.doctype.payment_entry.payment_entry import get_payment_entry 
-
-		sales_invoice = lease.latest_invoice()
-		payment_entry: PaymentEntry = get_payment_entry('Sales Invoice', 
-												  sales_invoice.name, 
-												  party_amount=amount, 
-												  reference_no = '23324', # TODO Fix Magic Number
-												  reference_date=frappe.utils.today())
-		return payment_entry
-		# from erpnext.accounts.doctype.journal_entry.journal_entry import get_payment_entry_against_invoice
-		# payment_entry: PaymentEntry = get_payment_entry_against_invoice('Sales Invoice', sales_invoice.name, amount)
-
 	@staticmethod
 	def calculate_renewal_buffer(period_end: DF.Date) -> DF.Date:
 		"""
 		Calculate the date 14 days before the period ends.
 		"""
 		return frappe.utils.add_days(period_end, -14)
+
 
 	@staticmethod
 	def next_renew_date(lease: 'Lease') -> DF.Date:
@@ -216,7 +199,8 @@ class Lease(Document):
 
 		today = frappe.utils.today()
 		period_end = latest_period.end_date
-		renewal_buffer = Lease.calculate_renewal_buffer(period_end)
+		renewal_buffer = frappe.utils.get_date_str(Lease.calculate_renewal_buffer(period_end))
+		# frappe.utils.get_date_str()
 
 		renewal_date = max(today, renewal_buffer)
 		return min(lease.end_date, renewal_date)
