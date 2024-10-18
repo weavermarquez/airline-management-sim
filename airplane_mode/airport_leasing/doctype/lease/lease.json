@@ -87,6 +87,7 @@
   {
    "fieldname": "rental_rate",
    "fieldtype": "Int",
+   "is_virtual": 1,
    "label": "Rental Rate",
    "non_negative": 1
   },
@@ -178,7 +179,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2024-10-18 16:23:18.684280",
+ "modified": "2024-10-18 17:11:46.795772",
  "modified_by": "Administrator",
  "module": "Airport Leasing",
  "name": "Lease",
