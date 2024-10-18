@@ -43,7 +43,7 @@ class Room(Document):
 	# CONTROLLERS 
 	# ====================
 
-	def autoname(self) -> str:
+	def autoname(self) -> None:
 		airport_code = frappe.get_value('Airport', self.airport, 'code')
 		self.name = f"{airport_code}{self.room_number}"
 
