@@ -38,15 +38,36 @@ class Room(Document):
 	UOM = 'Week'
 	ITEM_GROUP = 'Real Estate Leasing'
 
+	# ==================== 
+	# CONTROLLERS 
+	# ====================
+
 	def autoname(self) -> str:
 		airport_code = frappe.get_value('Airport', self.airport, 'code')
-		room_name = f"{airport_code}{self.room_number}"
-		self.name = room_name
-		return room_name
+		self.name = f"{airport_code}{self.room_number}"
 
 	def validate(self):
 		# airport, room number, area, capacity
 		self.autofill_rental_rate()
+
+
+	def on_submit(self) -> None:
+		if not self.item_exists():
+			self.create_item()
+
+	def on_update_after_submit(self) -> None:
+		# read only:
+		# item next date
+		# transactions
+		pass
+
+
+	# ==================== 
+	# PUBLIC INSTANCE METHODS
+	# ====================
+
+	def item_exists(self) -> bool:
+		return frappe.db.exists('Item', self.name)
 
 	def autofill_rental_rate(self) -> None:
 		"""Order of priority for rental rates, from most to least important:
@@ -60,13 +81,6 @@ class Room(Document):
 
 		self.rental_rate = frappe.get_doc('Airport Leasing Settings').default_rental_rate
 
-
-	def item_exists(self) -> bool:
-		return frappe.db.exists('Item', self.name)
-
-	def on_submit(self) -> None:
-		if not self.item_exists():
-			self.create_item()
 	
 	def create_item(self) -> None:
 		item: Item = frappe.new_doc('Item', 
@@ -99,12 +113,6 @@ class Room(Document):
 			case _:
 				assert_never(self.status)
 	
-	def on_update_after_submit(self) -> None:
-		# read only:
-		# item next date
-		# transactions
-		pass
-
 # TODO Fix the fragility of this function with try / except.
 @frappe.whitelist()
 def create_item(doc: str) -> None:
