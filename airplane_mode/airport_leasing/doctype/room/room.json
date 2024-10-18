@@ -17,6 +17,7 @@
   "room_number",
   "column_break_kzbp",
   "rental_rate",
+  "rental_rate_override",
   "physical_properties_section",
   "area",
   "capacity",
@@ -101,7 +102,8 @@
   },
   {
    "fieldname": "rental_rate",
-   "fieldtype": "Int",
+   "fieldtype": "Currency",
+   "is_virtual": 1,
    "label": "Rental Rate",
    "non_negative": 1
   },
@@ -142,6 +144,12 @@
    "fieldtype": "Float",
    "label": "Height",
    "non_negative": 1
+  },
+  {
+   "fieldname": "rental_rate_override",
+   "fieldtype": "Currency",
+   "label": "Rental Rate Override",
+   "non_negative": 1
   }
  ],
  "index_web_pages_for_search": 1,
@@ -156,7 +164,7 @@
    "link_fieldname": "leasing_of"
   }
  ],
- "modified": "2024-09-10 16:31:47.548280",
+ "modified": "2024-10-18 17:01:59.504319",
  "modified_by": "Administrator",
  "module": "Airport Leasing",
  "name": "Room",

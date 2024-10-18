@@ -65,7 +65,6 @@ class Lease(Document):
 			earliest_backdate = frappe.utils.add_to_date(frappe.utils.today(), weeks=-self.period_weeks())
 			return earliest_backdate < self.start_date
 
-		# self.autofill_rental_rate()
 		room: Room = frappe.get_doc('Room', self.leasing_of)
 		preconditions = [room_submitted, room_available, chronological_dates, minimum_one_period, backdated_recently]
 		for pc in preconditions:
@@ -97,6 +96,10 @@ class Lease(Document):
 	@property
 	def outstanding_balance(self):
 		return self.total_owing - self.total_paid
+
+	@property
+	def rental_rate(self):
+		return frappe.get_cached_doc('Room', self.leasing_of).auto_rental_rate()
 
 	# ==================== 
 	# PUBLIC INSTANCE METHODS

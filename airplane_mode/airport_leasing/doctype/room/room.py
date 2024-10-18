@@ -28,7 +28,8 @@ class Room(Document):
 		height: DF.Float
 		length: DF.Float
 		operated_by: DF.Link | None
-		rental_rate: DF.Int
+		rental_rate: DF.Currency
+		rental_rate_override: DF.Currency
 		room_number: DF.Int
 		status: DF.Literal["Vacant", "Leased", "Under maintenance"]
 		width: DF.Float
@@ -42,13 +43,9 @@ class Room(Document):
 	# CONTROLLERS 
 	# ====================
 
-	def autoname(self) -> str:
+	def autoname(self) -> None:
 		airport_code = frappe.get_value('Airport', self.airport, 'code')
 		self.name = f"{airport_code}{self.room_number}"
-
-	def validate(self):
-		# airport, room number, area, capacity
-		self.autofill_rental_rate()
 
 
 	def on_submit(self) -> None:
@@ -61,6 +58,9 @@ class Room(Document):
 		# transactions
 		pass
 
+	@property
+	def rental_rate(self) -> float:
+		return frappe.get_doc('Airport Leasing Settings').default_rental_rate
 
 	# ==================== 
 	# PUBLIC INSTANCE METHODS
@@ -69,26 +69,24 @@ class Room(Document):
 	def item_exists(self) -> bool:
 		return frappe.db.exists('Item', self.name)
 
-	def autofill_rental_rate(self) -> None:
-		"""Order of priority for rental rates, from most to least important:
-		1. Pre-existing, user-set rate
-		3. user-set rate in Airport Leasing Settings
-		4. default system rate in Airport Leasing Settings"""
-		# TODO Set default rental rate logic in Room as well
+	def auto_rental_rate(self) -> float:
+		"""Order of selecting rental rates
+		1. User-set document rate in Room
+		2. User-set global rate in Airport Leasing Settings
+		3. App-set global rate in Airport Leasing Settings"""
 
-		if self.rental_rate:
-			return
+		if self.rental_rate_override:
+			return self.rental_rate_override
+		else:
+			return self.rental_rate
 
-		self.rental_rate = frappe.get_doc('Airport Leasing Settings').default_rental_rate
-
-	
 	def create_item(self) -> None:
 		item: Item = frappe.new_doc('Item', 
 			item_code = self.name,
 			item_group = Room.ITEM_GROUP,
 			stock_uom = Room.UOM,
 			sales_uom = Room.UOM,
-			standard_rate = self.rental_rate,
+			standard_rate = self.auto_rental_rate(),
 			is_stock_item = 0,
 			is_purchase_item = 0,
 			grant_commission = 0,
