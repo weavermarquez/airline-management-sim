@@ -95,7 +95,13 @@ class Lease(Document):
 
 	@property
 	def outstanding_balance(self):
-		return self.total_owing - self.total_paid
+		periods = self.get_all_children('Lease Period')
+		total_outstanding = sum(frappe.get_cached_value('Sales Invoice', 
+							  period.invoice, 'outstanding_amount') 
+							  for period in periods if period.invoice)
+		
+		return total_outstanding
+		# return self.total_owing - self.total_paid
 
 	@property
 	def rental_rate(self):
@@ -130,12 +136,24 @@ class Lease(Document):
 			case _:
 				assert_never(self.period_length)
 
+	def unpaid_periods(self) -> list[dict]:
+		if not self.periods:
+			return None
 
-	def latest_period(self) -> LeasePeriod:
+		def unpaid(period) -> bool:
+			return period.status.startswith('Overdue', 'Partly Paid', 'Unpaid')
+
+		return list(filter(unpaid, self.periods))
+
+	def latest_period(self, *, filter_unpaid = False) -> LeasePeriod:
 		"""Return most recent Period based on latest start date"""
 		if not self.periods:
 			return None
-		return max(self.periods, key=lambda period: period.start_date)
+
+		if filter_unpaid:
+			return max(self.unpaid_periods(), key=lambda period: period.start_date)
+		else:
+			return max(self.periods, key=lambda period: period.start_date)
 
 
 	def remind_tenant(self):

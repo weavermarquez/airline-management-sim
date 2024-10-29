@@ -79,11 +79,15 @@
    "label": "Location"
   },
   {
-   "default": "Vacant",
+   "default": "Draft",
    "fieldname": "status",
    "fieldtype": "Select",
+   "in_standard_filter": 1,
    "label": "Status",
-   "options": "Vacant\nLeased\nUnder maintenance",
+   "length": 30,
+   "no_copy": 1,
+   "options": "Draft\nAvailable\nReserved\nOccupied\nMaintenance\nUnavailable\nCancelled",
+   "print_hide": 1,
    "read_only": 1
   },
   {
@@ -164,7 +168,7 @@
    "link_fieldname": "leasing_of"
   }
  ],
- "modified": "2024-10-18 17:01:59.504319",
+ "modified": "2024-10-28 20:07:26.176142",
  "modified_by": "Administrator",
  "module": "Airport Leasing",
  "name": "Room",

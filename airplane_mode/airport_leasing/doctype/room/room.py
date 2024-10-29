@@ -31,7 +31,7 @@ class Room(Document):
 		rental_rate: DF.Currency
 		rental_rate_override: DF.Currency
 		room_number: DF.Int
-		status: DF.Literal["Vacant", "Leased", "Under maintenance"]
+		status: DF.Literal["Draft", "Available", "Reserved", "Occupied", "Maintenance", "Unavailable", "Cancelled"]
 		width: DF.Float
 	# end: auto-generated types
 	pass
@@ -47,20 +47,53 @@ class Room(Document):
 		airport_code = frappe.get_value('Airport', self.airport, 'code')
 		self.name = f"{airport_code}{self.room_number}"
 
+	def validate(self) -> None:
+		self.set_status()
 
 	def on_submit(self) -> None:
 		if not self.item_exists():
 			self.create_item()
 
 	def on_update_after_submit(self) -> None:
-		# read only:
-		# item next date
-		# transactions
+		# self.set_status()
 		pass
+
+	def on_cancel(self) -> None:
+		# set status accordingly?
+		pass
+
+	def set_status(self, update=False) -> None:
+		def room_leases(docstatus: int) -> list[dict] | list[str]:
+			return frappe.get_all('Lease', filters={
+					'leasing_of': self.name,
+					'docstatus': ['in', [docstatus]]
+				})
+
+		if not self.docstatus.is_submitted():
+			return
+
+		draft_leases = room_leases(0)
+		active_leases = room_leases(1)
+
+		if self.maintenance:
+			self.status = "Maintenance"
+		elif any(active_leases):
+			self.status = "Occupied"
+		elif any(draft_leases):
+			self.status = "Reserved"
+		else:
+			self.status = "Available"
+
+		if update:
+			self.db_set("status", self.status, update_modified=True)
 
 	@property
 	def rental_rate(self) -> float:
 		return frappe.get_doc('Airport Leasing Settings').default_rental_rate
+
+	# @property
+	# def status(self) -> str:
+	# 	pass
 
 	# ==================== 
 	# PUBLIC INSTANCE METHODS
@@ -99,17 +132,6 @@ class Room(Document):
 			title='Room Item Creation',
 			indicator='green')
 
-	# Not happy with this. TODO solve with Domain Driven Design.
-	def available(self) -> bool:
-		"""Room must be Vacant before adding to new Leases"""
-		from typing_extensions import assert_never
-		match self.status:
-			case 'Vacant':
-				return True
-			case 'Under maintenance' | 'Leased':
-				return False
-			case _:
-				assert_never(self.status)
 	
 # TODO Fix the fragility of this function with try / except.
 @frappe.whitelist()

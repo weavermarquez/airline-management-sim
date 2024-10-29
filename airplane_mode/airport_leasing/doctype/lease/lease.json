@@ -11,6 +11,7 @@
   "amended_from",
   "leasing_of",
   "rental_rate",
+  "status",
   "column_break_onqo",
   "leased_from",
   "leased_to",
@@ -174,12 +175,23 @@
    "label": "Total Paid",
    "non_negative": 1,
    "read_only": 1
+  },
+  {
+   "default": "Draft",
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "in_standard_filter": 1,
+   "label": "Status",
+   "length": 30,
+   "no_copy": 1,
+   "options": "Draft\nActive\nOverdue\nExpired\nRenewed\nTerminated",
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2024-10-18 17:11:46.795772",
+ "modified": "2024-10-28 20:02:24.754186",
  "modified_by": "Administrator",
  "module": "Airport Leasing",
  "name": "Lease",

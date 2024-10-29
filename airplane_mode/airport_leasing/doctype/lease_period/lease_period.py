@@ -21,15 +21,16 @@ class LeasePeriod(Document):
 		parentfield: DF.Data
 		parenttype: DF.Data
 		start_date: DF.Date | None
+		status: DF.ReadOnly | None
 	# end: auto-generated types
 	pass
 
 	def validate(self) -> None:
-		"""Submit the Sales Invoice if not submitted."""
-		record = frappe.get_doc(self.invoice)
-		if not record.docstatus.is_submitted():
-			record.submit()
+		pass
 
+	@property
+	def status(self) -> str:
+		return frappe.get_cached_value('Sales Invoice', self.invoice, 'status')
 
 	# ==================== 
 	# PUBLIC INSTANCE METHODS
