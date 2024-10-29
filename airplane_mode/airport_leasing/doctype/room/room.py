@@ -27,11 +27,12 @@ class Room(Document):
 		entrances_and_exits: DF.Int
 		height: DF.Float
 		length: DF.Float
+		maintenance: DF.Check
 		operated_by: DF.Link | None
 		rental_rate: DF.Currency
 		rental_rate_override: DF.Currency
 		room_number: DF.Int
-		status: DF.Literal["Draft", "Available", "Reserved", "Occupied", "Maintenance", "Unavailable", "Cancelled"]
+		status: DF.Literal["Draft", "Available", "Reserved", "Occupied", "Maintenance", "Cancelled"]
 		width: DF.Float
 	# end: auto-generated types
 	pass
@@ -48,14 +49,14 @@ class Room(Document):
 		self.name = f"{airport_code}{self.room_number}"
 
 	def validate(self) -> None:
-		self.set_status()
+		self.set_status(update=True)
 
 	def on_submit(self) -> None:
 		if not self.item_exists():
 			self.create_item()
 
 	def on_update_after_submit(self) -> None:
-		# self.set_status()
+		self.set_status(update=True)
 		pass
 
 	def on_cancel(self) -> None:

@@ -29,7 +29,7 @@ class Lease(Document):
 		periods: DF.Table[LeasePeriod]
 		rental_rate: DF.Int
 		start_date: DF.Date
-		status: DF.Literal["Draft", "Active", "Overdue", "Expired", "Renewed", "Terminated"]
+		status: DF.Literal["Draft", "Submitted", "Active", "Overdue", "Cancelled"]
 		total_owing: DF.Currency
 		total_paid: DF.Currency
 	# end: auto-generated types
@@ -71,6 +71,7 @@ class Lease(Document):
 		for pc in preconditions:
 			if not pc():
 				frappe.throw(pc.__doc__)
+		self.set_status()
 
 	def before_submit(self) -> None:
 		"""Upon finalizing Lease, start the first Lease Period"""
