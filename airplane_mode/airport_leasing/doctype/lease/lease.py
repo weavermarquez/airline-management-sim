@@ -29,6 +29,7 @@ class Lease(Document):
 		periods: DF.Table[LeasePeriod]
 		rental_rate: DF.Int
 		start_date: DF.Date
+		status: DF.Literal["Draft", "Active", "Overdue", "Expired", "Renewed", "Terminated"]
 		total_owing: DF.Currency
 		total_paid: DF.Currency
 	# end: auto-generated types
@@ -111,7 +112,7 @@ class Lease(Document):
 	# PUBLIC INSTANCE METHODS
 	# ====================
 	def next_period(self) -> None:
-		"""At the end of this period, another period will begin."""
+		"""Upon finalizing the lease, or two weeks before end of the most recent period, another period will begin."""
 		from airplane_mode.airport_leasing.doctype.lease_period.lease_period import LeasePeriod
 		next_period = LeasePeriod.next_period(self)
 		self.append('periods', next_period)
@@ -120,9 +121,11 @@ class Lease(Document):
 		# This will cause the "Saved after opening Error.""
 
 
-	def offboard() -> None:
+	# TODO
+	def offboard(self) -> None:
 		"""The current period will end at lease end. Begin offboarding."""
-		pass
+		self.offboard = True
+		self.save()
 
 
 	def period_weeks(self) -> int:
@@ -141,7 +144,7 @@ class Lease(Document):
 			return None
 
 		def unpaid(period) -> bool:
-			return period.status.startswith('Overdue', 'Partly Paid', 'Unpaid')
+			return period.status.startswith(('Overdue', 'Partly Paid', 'Unpaid'))
 
 		return list(filter(unpaid, self.periods))
 
@@ -167,6 +170,19 @@ class Lease(Document):
 		self.append('payments', lease_payment)
 		self.save()
 
+	def set_status(self, update=False, update_modified=True) -> None:
+		if not self.docstatus.is_submitted():
+			return
+
+		if any(period.status.startswith('Overdue') for period in self.periods):
+			self.status = "Overdue"
+		else:
+			self.status = "Active"
+
+		if update:
+			self.db_set("status", self.status, update_modified=update_modified)
+
+
 	# ==================== 
 	# STATIC METHODS
 	# ====================
@@ -183,12 +199,13 @@ class Lease(Document):
 		lease: Lease = frappe.get_doc(json.loads(doc))
 		today = frappe.utils.today()
 
-		if any(lease.next_date != today, not lease.docstatus.is_submitted()):
+		lease.set_status(update=True, update_modified=False)
+
+		if any(lease.next_date != today, lease.docstatus.is_draft(), lease.docstatus.is_cancelled()):
+			# TODO Add bool lease.offboarded above.
+			# TODO New boolean variable to see if it has already been offboarded?
 			return
 		
-		# TODO unpaid deposit.
-		unpaid = False
-		# TODO New boolean variable to see if it has already been offboarded?
 		expiring_soon = Lease.calculate_renewal_buffer(lease.end_date) <= today
 		if expiring_soon:
 			return lease.offboard()
