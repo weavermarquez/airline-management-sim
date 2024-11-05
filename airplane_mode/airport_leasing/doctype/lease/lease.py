@@ -59,6 +59,7 @@ class Lease(Document):
 
 	def _validate_room_status(self, on_submit=False) -> bool:
 		"""Room must be valid when adding to any new leases."""
+		from airplane_mode.airport_leasing.doctype.room.room import Room
 		message = "Room must be valid when adding to any new leases."
 		valid_status = Room.LEASE_DRAFT_ROOM_STATUS if not on_submit else Room.LEASE_SUBMIT_ROOM_STATUS
 		is_valid = frappe.get_value('Room', self.leasing_of, 'status') in valid_status
@@ -109,6 +110,18 @@ class Lease(Document):
 			frappe.throw(message)
 		self.next_period()
 
+	def on_submit(self) -> None:
+		room = frappe.get_doc('Room', self.leasing_of)
+		room.set_status(update=True)
+
+	def on_update_after_submit(self) -> None:
+		room = frappe.get_doc('Room', self.leasing_of)
+		room.set_status(update=True)
+	
+	def on_cancel(self) -> None:
+		room = frappe.get_doc('Room', self.leasing_of)
+		room.set_status(update=True)
+
 	@property
 	def total_owing(self) -> DF.Currency:
 		periods = self.get_all_children('Lease Period')
@@ -158,6 +171,10 @@ class Lease(Document):
 		self.status = 'Offboarding'
 		self.save()
 
+	def terminate(self) -> None:
+		"""Finalize lease termination process."""
+		self.status = 'Terminated'
+		self.cancel()
 
 	def period_weeks(self) -> int:
 		"""Get number of weeks for this lease's period length."""
@@ -240,14 +257,11 @@ class Lease(Document):
 		expiring_soon = Lease.calculate_renewal_buffer(lease.end_date) <= today
 		if lease.status == 'Offboarding' and lease.end_date == today:
 			# TODO Handle offboarding logic here if needed
-			lease.status = 'Terminated'
-			lease.save()
-			return
+			return lease.terminate()
 		elif expiring_soon:
-			lease.offboard()
-			return
+			return lease.offboard()
 		else:
-			lease.next_period()
+			return lease.next_period()
 
 
 	@staticmethod

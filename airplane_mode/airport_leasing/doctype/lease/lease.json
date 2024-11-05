@@ -192,7 +192,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2024-11-04 23:11:26.781298",
+ "modified": "2024-11-04 23:41:53.913614",
  "modified_by": "Administrator",
  "module": "Airport Leasing",
  "name": "Lease",
@@ -235,6 +235,14 @@
   {
    "color": "Gray",
    "title": "Cancelled"
+  },
+  {
+   "color": "Purple",
+   "title": "Offboarding"
+  },
+  {
+   "color": "Gray",
+   "title": "Terminated"
   }
  ]
 }

@@ -38,7 +38,7 @@ class LeasePeriod(Document):
 
 	def validate(self) -> None:
 		"""Validate lease period dates and invoice"""
-		if self.start_date and self.end_date and self.start_date > self.end_date:
+		if all(self.start_date, self.end_date, self.start_date > self.end_date):
 			frappe.throw('Start date cannot be after end date')
 		
 		if self.invoice and not frappe.db.exists('Sales Invoice', self.invoice):
@@ -144,8 +144,12 @@ class LeasePeriod(Document):
 					qty = weeks,
 					uom = Room.UOM)
 
+		# NOTE I am not happy with this API. Easily confusing the 
+		# property as the actual value, and forgetting about auto_rental_rate().
+		# At the very least, get_value is always incorrect!!!
 		# Get rate from Room document or pricing rules
-		item.rate = frappe.get_value('Room', room, 'rate') # or 0
+		item.rate = frappe.get_doc('Room', room).auto_rental_rate()
+
 		return item
 
 
