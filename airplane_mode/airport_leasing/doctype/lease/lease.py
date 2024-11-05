@@ -100,7 +100,7 @@ class Lease(Document):
 			if not is_valid:
 				frappe.throw(message)
 
-		self.set_status()
+		self.set_status(update=True)
 
 	def before_submit(self) -> None:
 		"""Upon finalizing Lease, start the first Lease Period"""
