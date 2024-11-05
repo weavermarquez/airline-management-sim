@@ -39,6 +39,9 @@ class Room(Document):
 
 	UOM = 'Week'
 	ITEM_GROUP = 'Real Estate Leasing'
+	LEASE_INVALID_ROOM_STATUS = ('Draft', 'Cancelled')
+	LEASE_DRAFT_ROOM_STATUS = ('Available', 'Reserved', 'Occupied', 'Maintenance')	
+	LEASE_SUBMIT_ROOM_STATUS = ('Available', 'Reserved')
 
 	# ==================== 
 	# CONTROLLERS 
@@ -52,6 +55,7 @@ class Room(Document):
 		self.set_status(update=True)
 
 	def on_submit(self) -> None:
+		self.set_status(update=True)
 		if not self.item_exists():
 			self.create_item()
 
@@ -64,14 +68,29 @@ class Room(Document):
 		pass
 
 	def set_status(self, update=False) -> None:
+		"""Set the room status based on maintenance flag and lease status.
+
+		Status values:
+		- Maintenance: Room is under maintenance
+		- Occupied: Room has active (submitted) leases
+		- Reserved: Room has draft leases
+		- Available: Room has no leases and is not under maintenance
+		
+		Args:
+			update (bool): If True, updates the status in the database
+		"""
 		def room_leases(docstatus: int) -> list[dict] | list[str]:
 			return frappe.get_all('Lease', filters={
 					'leasing_of': self.name,
 					'docstatus': ['in', [docstatus]]
 				})
 
-		if not self.docstatus.is_submitted():
-			return
+		if self.docstatus.is_draft():
+			self.status = "Draft"
+			return 
+		elif self.docstatus.is_cancelled():
+			self.status = "Cancelled"
+			return 
 
 		draft_leases = room_leases(0)
 		active_leases = room_leases(1)
