@@ -77,7 +77,6 @@ class Lease(Document):
 		message = f"Duration of lease should be at least 1 period. Please choose a start date later than {minimum_end}"
 		return is_valid, message
 
-	# TODO Fix use dynamic docstrings.
 	def _validate_backdated_recently(self) -> bool:
 		"""Check if start date is within one period of today."""
 		earliest_backdate = frappe.utils.add_to_date(frappe.utils.today(), weeks=-self.period_weeks())
@@ -154,7 +153,6 @@ class Lease(Document):
 		# This will cause the "Saved after opening Error.""
 
 
-	# TODO
 	def offboard(self) -> None:
 		"""The current period will end at lease end. Begin offboarding."""
 		self.offboard = True
@@ -237,13 +235,15 @@ class Lease(Document):
 		lease.set_status(update=True, update_modified=False)
 
 		if any(lease.next_date != today, lease.docstatus.is_draft(), lease.docstatus.is_cancelled()):
-			# TODO Add bool lease.offboarded above.
-			# TODO New boolean variable to see if it has already been offboarded?
 			return
 		
 		expiring_soon = Lease.calculate_renewal_buffer(lease.end_date) <= today
-		if expiring_soon:
-			return lease.offboard()
+		if lease.offboarded:
+			# TODO Do something? Or not?
+			return
+		elif expiring_soon:
+			lease.offboard()
+			return
 		else:
 			lease.next_period()
 

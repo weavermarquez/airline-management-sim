@@ -81,7 +81,6 @@ class TestLeaseUnit(FrappeTestCase):
 			If not, I'm testing the biz logic.")
 
 
-	# TODO This probably sucks
 	@patch('frappe.get_cached_value')
 	def test_total_paid(self):
 		"""Test total_paid property calculates sum of all payments correctly"""
@@ -109,7 +108,6 @@ class TestLeaseUnit(FrappeTestCase):
 			 patch('frappe.get_cached_value', mock_db_get):
 			self.assertEqual(self.lease.total_paid, 1500)
 
-	# TODO This probably sucks
 	@patch('frappe.get_cached_value')
 	def test_outstanding_balance(self, mock_get_cached_value):
 		"""Test outstanding_balance property calculates total outstanding correctly"""

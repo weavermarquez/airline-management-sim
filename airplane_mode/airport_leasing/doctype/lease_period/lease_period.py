@@ -166,7 +166,7 @@ class LeasePeriod(Document):
 			For the first period this gives a 2 week buffer, but subsequent periods
 			are due on the start date of the next period.
 		"""
-		# TODO The due_date gives 2wk buffer after first period
+		# NOTE The due_date gives 2wk buffer after first period
 		# But is due on the day the next period begins.
 		sales_invoice: SalesInvoice = frappe.new_doc('Sales Invoice', 
 			customer = customer,

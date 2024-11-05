@@ -28,7 +28,6 @@ class LeasePayment(Document):
 	# end: auto-generated types
 	pass
 
-	# TODO Better Throw Message.
 	def on_trash(self) -> None:
 		"""Prevent deletion of lease payments."""
 		frappe.throw("Lease Payments cannot be deleted as they are part of important financial records.")
