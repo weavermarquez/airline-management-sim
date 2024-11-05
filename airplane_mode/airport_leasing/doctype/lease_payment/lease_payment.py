@@ -4,6 +4,11 @@
 # from __future__ import annotations
 import frappe
 from frappe.model.document import Document
+from airplane_mode.airport_leasing.doctype.lease.lease import Lease
+from erpnext.accounts.doctype.payment_entry.payment_entry import (PaymentEntry, get_payment_entry)
+from typing import (TypeAlias, TYPE_CHECKING)
+
+# Lease: TypeAlias = 'frappe.types.Document'
 
 
 class LeasePayment(Document):
@@ -29,8 +34,17 @@ class LeasePayment(Document):
 
 
 	@staticmethod
-	def new_payment(lease: 'Lease', amount, reference_no) -> 'LeasePayment':
-		from airplane_mode.airport_leasing.doctype.lease_payment.lease_payment import LeasePayment
+	def new_payment(lease: Lease, amount: float, reference_no: str) -> 'LeasePayment':
+		"""Create a new lease payment with associated payment entry.
+		
+		Args:
+			lease: The lease document to create payment for
+			amount: Payment amount
+			reference_no: External reference number for the payment
+			
+		Returns:
+			LeasePayment: The newly created lease payment document
+		"""
 
 		payment_entry = LeasePayment.new_payment_entry(lease, amount, reference_no)
 		lease_payment: LeasePayment = frappe.new_doc('Lease Payment', payment_entry=payment_entry.name)
@@ -38,12 +52,24 @@ class LeasePayment(Document):
 
 
 	@staticmethod
-	def new_payment_entry(lease: 'Lease', amount: float, reference_no: 'DF.Data') -> 'PaymentEntry':
-		"""Associate the newly user-created Payment Entry to a Lease Transaction"""
-		from erpnext.accounts.doctype.payment_entry.payment_entry import get_payment_entry 
+	def new_payment_entry(lease: Lease, amount: float, reference_no: str) -> PaymentEntry:
+		"""Create and submit a new payment entry for a lease invoice.
+		
+		Args:
+			lease: The lease document to create payment entry for
+			amount: Payment amount
+			reference_no: External reference number for the payment
+			
+		Returns:
+			PaymentEntry: The submitted payment entry
+			
+		Raises:
+			frappe.ValidationError: If lease has no latest period or invoice
+		"""
 
-		sales_invoice_name = lease.latest_period().invoice
-												#   reference_no=reference_no,
+		latest_period = lease.latest_period()
+		if not latest_period or not latest_period.invoice:
+			frappe.throw("Cannot create payment: No valid invoice found for the lease's payment period")
 
 		payment_entry: PaymentEntry = get_payment_entry('Sales Invoice', 
 												  sales_invoice_name,
