@@ -30,7 +30,8 @@ class LeasePayment(Document):
 
 	# TODO Better Throw Message.
 	def on_trash(self) -> None:
-		frappe.throw("Cannot delete Lease Payments.")
+		"""Prevent deletion of lease payments."""
+		frappe.throw("Lease Payments cannot be deleted as they are part of important financial records.")
 
 
 	@staticmethod
@@ -71,11 +72,12 @@ class LeasePayment(Document):
 		if not latest_period or not latest_period.invoice:
 			frappe.throw("Cannot create payment: No valid invoice found for the lease's payment period")
 
-		payment_entry: PaymentEntry = get_payment_entry('Sales Invoice', 
-												  sales_invoice_name,
-												  party_amount=amount, 
-												  reference_date=frappe.utils.today())
-
+		payment_entry = get_payment_entry(
+			'Sales Invoice', 
+			latest_period.invoice, 
+			party_amount=amount, 
+			reference_date=frappe.utils.today()
+		)
 		payment_entry.reference_no = reference_no
 		return payment_entry.submit()
 		# from erpnext.accounts.doctype.journal_entry.journal_entry import get_payment_entry_against_invoice
