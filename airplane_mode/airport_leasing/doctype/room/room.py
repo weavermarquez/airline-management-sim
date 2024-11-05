@@ -6,6 +6,7 @@ import json
 from frappe.model.document import Document
 
 from typing import TYPE_CHECKING
+from typing import Optional
 
 if TYPE_CHECKING:
 	from frappe.types import DF
@@ -81,7 +82,7 @@ class Room(Document):
 		else:
 			return self.rental_rate
 
-	def item_exists(self) -> bool:
+	def item_exists(self) -> Optional[str]:
 		return frappe.db.exists('Item', self.name)
 
 	def create_item(self) -> None:
