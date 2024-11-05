@@ -61,11 +61,50 @@ class Room(Document):
 
 	def on_update_after_submit(self) -> None:
 		self.set_status(update=True)
-		pass
 
-	def on_cancel(self) -> None:
-		# set status accordingly?
-		pass
+	@property
+	def rental_rate(self) -> float:
+		return frappe.get_doc('Airport Leasing Settings').default_rental_rate
+
+	# ==================== 
+	# PUBLIC INSTANCE METHODS
+	# ====================
+
+	def auto_rental_rate(self) -> float:
+		"""Order of selecting rental rates
+		1. User-set document rate in Room
+		2. User-set global rate in Airport Leasing Settings
+		3. App-set global rate in Airport Leasing Settings"""
+
+		if self.rental_rate_override:
+			return self.rental_rate_override
+		else:
+			return self.rental_rate
+
+	def item_exists(self) -> bool:
+		return frappe.db.exists('Item', self.name)
+
+	def create_item(self) -> None:
+		item_args = {
+			'item_code' : self.name,
+			'item_group' : Room.ITEM_GROUP,
+			'stock_uom' : Room.UOM,
+			'sales_uom' : Room.UOM,
+			'standard_rate' : self.auto_rental_rate(),
+			'is_stock_item' : 0,
+			'is_purchase_item' : 0,
+			'grant_commission' : 0,
+			'include_item_in_manufacturing' : 0
+		}
+
+		item: Item = frappe.new_doc('Item', **item_args)
+		item.save()
+		self.notify_update()
+		frappe.msgprint(
+			msg='Item "%s" created and associated to this Room.' % (self.name),
+			title='Room Item Creation',
+			indicator='green')
+
 
 	def set_status(self, update=False) -> None:
 		"""Set the room status based on maintenance flag and lease status.
@@ -106,51 +145,6 @@ class Room(Document):
 
 		if update:
 			self.db_set("status", self.status, update_modified=True)
-
-	@property
-	def rental_rate(self) -> float:
-		return frappe.get_doc('Airport Leasing Settings').default_rental_rate
-
-	# @property
-	# def status(self) -> str:
-	# 	pass
-
-	# ==================== 
-	# PUBLIC INSTANCE METHODS
-	# ====================
-
-	def item_exists(self) -> bool:
-		return frappe.db.exists('Item', self.name)
-
-	def auto_rental_rate(self) -> float:
-		"""Order of selecting rental rates
-		1. User-set document rate in Room
-		2. User-set global rate in Airport Leasing Settings
-		3. App-set global rate in Airport Leasing Settings"""
-
-		if self.rental_rate_override:
-			return self.rental_rate_override
-		else:
-			return self.rental_rate
-
-	def create_item(self) -> None:
-		item: Item = frappe.new_doc('Item', 
-			item_code = self.name,
-			item_group = Room.ITEM_GROUP,
-			stock_uom = Room.UOM,
-			sales_uom = Room.UOM,
-			standard_rate = self.auto_rental_rate(),
-			is_stock_item = 0,
-			is_purchase_item = 0,
-			grant_commission = 0,
-			include_item_in_manufacturing = 0,
-		)
-		item.save()
-		self.notify_update()
-		frappe.msgprint(
-			msg='Item "%s" created and associated to this Room.' % (self.name),
-			title='Room Item Creation',
-			indicator='green')
 
 	
 # TODO Fix the fragility of this function with try / except.
