@@ -185,14 +185,14 @@
    "label": "Status",
    "length": 30,
    "no_copy": 1,
-   "options": "Draft\nSubmitted\nActive\nOverdue\nCancelled",
+   "options": "Draft\nSubmitted\nActive\nOverdue\nOffboarding\nTerminated\nCancelled",
    "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2024-10-28 20:32:09.367624",
+ "modified": "2024-11-04 23:11:26.781298",
  "modified_by": "Administrator",
  "module": "Airport Leasing",
  "name": "Lease",

@@ -43,7 +43,7 @@ class Lease(Document):
 		periods: DF.Table[LeasePeriod]
 		rental_rate: DF.Int
 		start_date: DF.Date
-		status: DF.Literal["Draft", "Submitted", "Active", "Overdue", "Cancelled"]
+		status: DF.Literal["Draft", "Submitted", "Active", "Overdue", "Offboarding", "Terminated", "Cancelled"]
 		total_owing: DF.Currency
 		total_paid: DF.Currency
 	# end: auto-generated types
@@ -154,8 +154,8 @@ class Lease(Document):
 
 
 	def offboard(self) -> None:
-		"""The current period will end at lease end. Begin offboarding."""
-		self.offboard = True
+		"""Begin lease termination process."""
+		self.status = 'Offboarding'
 		self.save()
 
 
@@ -238,8 +238,10 @@ class Lease(Document):
 			return
 		
 		expiring_soon = Lease.calculate_renewal_buffer(lease.end_date) <= today
-		if lease.offboarded:
-			# TODO Do something? Or not?
+		if lease.status == 'Offboarding' and lease.end_date == today:
+			# TODO Handle offboarding logic here if needed
+			lease.status = 'Terminated'
+			lease.save()
 			return
 		elif expiring_soon:
 			lease.offboard()
