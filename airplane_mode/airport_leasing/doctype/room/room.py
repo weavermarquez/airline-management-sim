@@ -6,6 +6,7 @@ import json
 from frappe.model.document import Document
 
 from typing import TYPE_CHECKING
+from typing import Optional
 
 if TYPE_CHECKING:
 	from frappe.types import DF
@@ -27,17 +28,21 @@ class Room(Document):
 		entrances_and_exits: DF.Int
 		height: DF.Float
 		length: DF.Float
+		maintenance: DF.Check
 		operated_by: DF.Link | None
 		rental_rate: DF.Currency
 		rental_rate_override: DF.Currency
 		room_number: DF.Int
-		status: DF.Literal["Vacant", "Leased", "Under maintenance"]
+		status: DF.Literal["Draft", "Available", "Reserved", "Occupied", "Maintenance", "Cancelled"]
 		width: DF.Float
 	# end: auto-generated types
 	pass
 
 	UOM = 'Week'
 	ITEM_GROUP = 'Real Estate Leasing'
+	LEASE_INVALID_ROOM_STATUS = ('Draft', 'Cancelled')
+	LEASE_DRAFT_ROOM_STATUS = ('Available', 'Reserved', 'Occupied', 'Maintenance')	
+	LEASE_SUBMIT_ROOM_STATUS = ('Available', 'Reserved')
 
 	# ==================== 
 	# CONTROLLERS 
@@ -47,16 +52,16 @@ class Room(Document):
 		airport_code = frappe.get_value('Airport', self.airport, 'code')
 		self.name = f"{airport_code}{self.room_number}"
 
+	def validate(self) -> None:
+		self.set_status(update=True)
 
 	def on_submit(self) -> None:
+		self.set_status(update=True)
 		if not self.item_exists():
 			self.create_item()
 
 	def on_update_after_submit(self) -> None:
-		# read only:
-		# item next date
-		# transactions
-		pass
+		self.set_status(update=True)
 
 	@property
 	def rental_rate(self) -> float:
@@ -65,9 +70,6 @@ class Room(Document):
 	# ==================== 
 	# PUBLIC INSTANCE METHODS
 	# ====================
-
-	def item_exists(self) -> bool:
-		return frappe.db.exists('Item', self.name)
 
 	def auto_rental_rate(self) -> float:
 		"""Order of selecting rental rates
@@ -80,18 +82,23 @@ class Room(Document):
 		else:
 			return self.rental_rate
 
+	def item_exists(self) -> Optional[str]:
+		return frappe.db.exists('Item', self.name)
+
 	def create_item(self) -> None:
-		item: Item = frappe.new_doc('Item', 
-			item_code = self.name,
-			item_group = Room.ITEM_GROUP,
-			stock_uom = Room.UOM,
-			sales_uom = Room.UOM,
-			standard_rate = self.auto_rental_rate(),
-			is_stock_item = 0,
-			is_purchase_item = 0,
-			grant_commission = 0,
-			include_item_in_manufacturing = 0,
-		)
+		item_args = {
+			'item_code' : self.name,
+			'item_group' : Room.ITEM_GROUP,
+			'stock_uom' : Room.UOM,
+			'sales_uom' : Room.UOM,
+			'standard_rate' : self.auto_rental_rate(),
+			'is_stock_item' : 0,
+			'is_purchase_item' : 0,
+			'grant_commission' : 0,
+			'include_item_in_manufacturing' : 0
+		}
+
+		item: Item = frappe.new_doc('Item', **item_args)
 		item.save()
 		self.notify_update()
 		frappe.msgprint(
@@ -99,17 +106,47 @@ class Room(Document):
 			title='Room Item Creation',
 			indicator='green')
 
-	# Not happy with this. TODO solve with Domain Driven Design.
-	def available(self) -> bool:
-		"""Room must be Vacant before adding to new Leases"""
-		from typing_extensions import assert_never
-		match self.status:
-			case 'Vacant':
-				return True
-			case 'Under maintenance' | 'Leased':
-				return False
-			case _:
-				assert_never(self.status)
+
+	def set_status(self, update=False) -> None:
+		"""Set the room status based on maintenance flag and lease status.
+
+		Status values:
+		- Maintenance: Room is under maintenance
+		- Occupied: Room has active (submitted) leases
+		- Reserved: Room has draft leases
+		- Available: Room has no leases and is not under maintenance
+		
+		Args:
+			update (bool): If True, updates the status in the database
+		"""
+		def room_leases(docstatus: int) -> list[dict] | list[str]:
+			return frappe.get_all('Lease', filters={
+					'leasing_of': self.name,
+					'docstatus': ['in', [docstatus]]
+				})
+
+		if self.docstatus.is_draft():
+			self.status = "Draft"
+			return 
+		elif self.docstatus.is_cancelled():
+			self.status = "Cancelled"
+			return 
+
+		draft_leases = room_leases(0)
+		active_leases = room_leases(1)
+
+		if self.maintenance:
+			self.status = "Maintenance"
+		elif any(active_leases):
+			self.status = "Occupied"
+		elif any(draft_leases):
+			self.status = "Reserved"
+		else:
+			self.status = "Available"
+
+		if update:
+			self.db_set("status", self.status, update_modified=True)
+
 	
 # TODO Fix the fragility of this function with try / except.
 @frappe.whitelist()

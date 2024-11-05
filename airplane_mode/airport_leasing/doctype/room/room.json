@@ -18,6 +18,7 @@
   "column_break_kzbp",
   "rental_rate",
   "rental_rate_override",
+  "maintenance",
   "physical_properties_section",
   "area",
   "capacity",
@@ -79,11 +80,16 @@
    "label": "Location"
   },
   {
-   "default": "Vacant",
+   "allow_on_submit": 1,
+   "default": "Draft",
    "fieldname": "status",
    "fieldtype": "Select",
+   "in_standard_filter": 1,
    "label": "Status",
-   "options": "Vacant\nLeased\nUnder maintenance",
+   "length": 30,
+   "no_copy": 1,
+   "options": "Draft\nAvailable\nReserved\nOccupied\nMaintenance\nCancelled",
+   "print_hide": 1,
    "read_only": 1
   },
   {
@@ -150,6 +156,13 @@
    "fieldtype": "Currency",
    "label": "Rental Rate Override",
    "non_negative": 1
+  },
+  {
+   "allow_on_submit": 1,
+   "default": "0",
+   "fieldname": "maintenance",
+   "fieldtype": "Check",
+   "label": "Maintenance"
   }
  ],
  "index_web_pages_for_search": 1,
@@ -164,7 +177,7 @@
    "link_fieldname": "leasing_of"
   }
  ],
- "modified": "2024-10-18 17:01:59.504319",
+ "modified": "2024-10-28 20:29:37.867396",
  "modified_by": "Administrator",
  "module": "Airport Leasing",
  "name": "Room",
@@ -188,16 +201,28 @@
  "sort_order": "DESC",
  "states": [
   {
-   "color": "Green",
-   "title": "Leased"
+   "color": "Gray",
+   "title": "Draft"
   },
   {
-   "color": "Orange",
-   "title": "Vacant"
+   "color": "Green",
+   "title": "Available"
+  },
+  {
+   "color": "Light Blue",
+   "title": "Reserved"
+  },
+  {
+   "color": "Light Blue",
+   "title": "Occupied"
   },
   {
    "color": "Yellow",
-   "title": "Under maintenance"
+   "title": "Maintenance"
+  },
+  {
+   "color": "Gray",
+   "title": "Cancelled"
   }
  ]
 }

@@ -2,10 +2,10 @@
 # See license.txt
 
 import frappe
+from contextlib import contextmanager
 from frappe.tests.utils import FrappeTestCase
-from airplane_mode.airport_leasing.doctype.room.room import Room
 from unittest.mock import ( MagicMock, Mock, patch )
-from airplane_mode.airplane_mode.doctype.airport.airport import Airport
+from airplane_mode.airport_leasing.doctype.room.room import Room
 
 from typing import TYPE_CHECKING
 
@@ -15,223 +15,295 @@ if TYPE_CHECKING:
 	from airplane_mode.airplane_mode.doctype.airport.airport import Airport
 
 
-class TestRoom(FrappeTestCase):
+class TestRoomUnit(FrappeTestCase):
+	"""Unit Tests for Room. 
+	Focuses on mocking static and public instance methods with mocks."""
+
+	# ===============================
+	# FIXTURES
+	# ===============================
+
+	@classmethod
+	def setUpClass(cls):
+		"""Runs once before all test in the class"""
+		super().setUpClass()
+
+		# Create shared test data that won't be modified by tests
+		cls.common_data = {
+			'airport': 'TEST_AIRPORT',
+			'airport_code': 'TEST_AIRPORT',
+			'room_number': 101,
+			'maintenance': False
+		}
+
+	@classmethod
+	def tearDownClass(cls):
+		super().tearDownClass()
+		# Clean up any class-level resources.
 
 	def setUp(self):
-		frappe.delete_doc_if_exists('Room', 'AVN371', 1)
-		frappe.delete_doc_if_exists('Airport', 'Clipper Airport', 1)
+		"""Run before each test method"""
+		self.room = frappe.new_doc('Room', **self.common_data)
 
-		self.room_number = 371
-		self.airport_code = 'AVN'
+	@contextmanager
+	def mock_frappe_calls(self):
+		"""Fixture that mocks common Frappe calls"""
+		with patch('frappe.get_value') as mock_get_value, \
+			patch('frappe.get_all') as mock_get_all, \
+			patch('frappe.new_doc') as mock_new_doc:
+			
+			mock_get_value.return_value = 'TEST'
+			yield {
+				'get_value': mock_get_value,
+				'get_all': mock_get_all,
+				'new_doc': mock_new_doc
+			}
 
-		self.foo_dict = frappe._dict({
-			'name': 'Clipper Airport',
-			'city': 'Aveeno',
-			'country': 'Lavenderia',
-			'code': self.airport_code,
-		})
-		self.bar_dict = frappe._dict({
-			'airport': self.foo_dict['name'],
-			'room_number': self.room_number,
-			'area': 142,
-			'capacity': 50,
-		})
-
-		self.airport: Airport = frappe.new_doc('Airport', **self.foo_dict)
-		self.room: Room = frappe.new_doc('Room', **self.bar_dict)
-
-class TestMockLearns(TestRoom):
-
-	def test_mock_basic(self):
-		foo= MagicMock(return_value=3)
-		value = foo(3, 4, 5, key='value')
-		foo.assert_called_with(3, 4, 5, key='value')
-		self.assertEqual(value, 3)
-
-	def test_side_effect_error(self):
-		mock = Mock(side_effect=KeyError('foo'))
-		def bluh():
-			return 1
-		self.assertRaises(KeyError, mock)
-		# Regular error if unexpected exception
-		# Failure if no exception
-
-	def test_side_effect_error_cm(self):
-		mock = Mock(side_effect=KeyError('foo'))
-		with self.assertRaises(KeyError, msg='UWU') as cm:
-			mock()
-		exception = cm.exception
-		self.assertEquals(exception.args, ('foo', ))
-		self.assertEquals(cm.msg, 'UWU')
-
-	def test_side_effect_function(self):
-		def side_effect(arg):
-			return values[arg]
-
-		values = {'a': 1, 'b': 2, 'c': 3}
-
-		mock = Mock()
-		mock.side_effect = side_effect
-
-		(a,b,c) = mock('a'), mock('b'), mock('c')
-		# (1, 2, 3)
-		self.assertEquals((a,b,c), (1,2,3))
-
-		mock.side_effect = [5, 4, 3, 2, 1]
-
-		(a,b,c) = mock(), mock(), mock()
-		self.assertEquals((a,b,c), (5,4,3))
-
-
-	#
-	# patch('path.to.Class') patches the dot.name.constructor.
-	#
-
-	def make_airport_uwu(self):
-		instance = frappe.new_doc('Airport', **self.foo_dict)
-		assert isinstance(instance, Airport)
-		assert not isinstance(instance.uwu, Mock)
-		assert not isinstance(instance, Mock)
-		return instance.uwu()
-		# module.foo
-
-	# NOTE Fails because this is attempting to mock the Constructor and Module.
-	def test_patch_new_doc(self):
-		with patch('airplane_mode.airplane_mode.doctype.airport.airport.Airport') as mock:
-			instance = mock.return_value
-			instance.uwu.return_value = 'the result'
-
-			result = self.make_airport_uwu()
-			self.assertEquals(result, 'the result')
+	@staticmethod
+	def status_cases():
+		return [
+			{
+				"expected_status": "Available",
+				"docstatus" : 1,
+				"maintenance": False,
+				"draft_leases": [],
+				"active_leases": []
+			},
+			{
+				"expected_status": "Occupied",
+				"docstatus" : 1,
+				"maintenance": False,
+				"draft_leases": [],
+				"active_leases": [{"name": "ACTIVE1"}]
+			},
+			{
+				"expected_status": "Occupied",
+				"docstatus" : 1,
+				"maintenance": False,
+				"draft_leases": [{"name": "DRAFT1"}],
+				"active_leases": [{"name": "ACTIVE1"}]
+			},
+			{
+				"expected_status": "Reserved",
+				"docstatus" : 1,
+				"maintenance": False,
+				"draft_leases": [{"name": "DRAFT1"}],
+				"active_leases": []
+			},
+			{
+				"expected_status": "Maintenance",
+				"docstatus" : 1,
+				"maintenance": True,
+				"draft_leases": [],
+				"active_leases": []
+			},
+			{
+				"expected_status": "Maintenance",
+				"docstatus" : 1,
+				"maintenance": True,
+				"draft_leases": [{"name": "DRAFT1"}],
+				"active_leases": [{"name": "ACTIVE1"}]
+			},
+			{
+				"expected_status": "Cancelled",
+				"docstatus": 2,
+				"maintenance": True,
+				"draft_leases": [{"name": "DRAFT1"}],
+				"active_leases": [{"name": "ACTIVE1"}]
+			},
+			{
+				"expected_status": "Draft",
+				"docstatus": 0,
+				"maintenance": True,
+				"draft_leases": [{"name": "DRAFT1"}],
+				"active_leases": [{"name": "ACTIVE1"}]
+			},
+		]
 
 
+	@classmethod
+	def _add_test(cls, case_number, case):
+		def mock_get_all(doctype, filters=None):
+			docstatus = filters.get('docstatus')[1]
+			draft_active_leases = {
+				0: case['draft_leases'], 
+				1: case['active_leases']
+			}
+			return draft_active_leases.get(docstatus[0], [])
 
-	def make_airport_owo(self):
-		instance = Airport(doctype='Airport', **self.foo_dict)
-		assert isinstance(instance, Airport)
-		assert not isinstance(instance.owo, Mock)
-		assert not isinstance(instance, Mock)
+		@patch('frappe.get_all', mock_get_all)
+		def test_method(self):
+			self.room.maintenance = case['maintenance']
+			self.room.docstatus = case['docstatus']
+			self.room.set_status(update=False)
 
-		print(f"OWO: Airport.owo is Mock?: {isinstance(instance.owo, Mock)}")
-		return instance.owo()
-		# module.foo
+			self.assertEqual(
+				self.room.status, 
+				case['expected_status'],
+				f"Failed for case: {case}"
+			)
 
-	def test_patch_class_constructor_full(self):
-		with patch('airplane_mode.airplane_mode.doctype.airport.airport.Airport') as mock:
-			instance = mock.return_value
-			instance.uwu.return_value = 'the result'
+		setattr(cls, f'test_set_status_{case_number}', test_method)
+		test_method.__name__ = f'test_set_status_{case_number}'
 
-			result = self.make_airport_owo()
-			self.assertEquals(result, 'the result')
-
-
-
-	def make_airport_awa(self):
-		import airplane_mode
-		instance = airplane_mode.airplane_mode.doctype.airport.airport.Airport(
-			doctype='Airport', **self.foo_dict)
-		assert isinstance(instance, Mock)
-		assert isinstance(instance.awa, Mock)
-		assert not isinstance(instance, Airport)
-
-		return instance.awa()
-		# module.foo
-
-	def test_patch_class_constructor_module(self):
-		with patch('airplane_mode.airplane_mode.doctype.airport.airport.Airport') as mock:
-			instance = mock.return_value
-			instance.awa.return_value = 'the result'
-
-			result = self.make_airport_awa()
-			self.assertEquals(result, 'the result')
+	@classmethod
+	def make_comprehensive_status_tests(cls):
+		test_cases = TestRoomUnit.status_cases()
+		for case_number, case in enumerate(test_cases):
+			cls._add_test(case_number, case)
 
 
-	#
-	# Patching /local/ Airport
-	#
-
-	def instantiate_airport_frappe(self) -> Airport:
-		airport = frappe.new_doc('Airport', **self.foo_dict)
-		return airport
-
-	# @patch('airplane_mode.airport_leasing.doctype.room.test_room.Airport')
-	@patch('airplane_mode.airplane_mode.doctype.airport.airport.Airport')
-	def test_patch_local_airport_frappe(self, MockAirport):
-		airport = frappe.new_doc('Airport', **self.foo_dict)
-		# airport = self.instantiate_airport_frappe()
-		print(f"MockAirport is type {type(MockAirport)}")
-		print(f"airport is type {type(airport)}")
-		self.assert_(isinstance(airport, MockAirport))
+	# def test_set_status_comprehensive(self):
+	# 	for index, case in enumerate(TestRoomUnit.status_cases()):
+	# 		with self.subTest(f"set_status subtest {index}", index=index, case=case):
+	# 			self.assertRequal
+	# 			self.test_two
+	# 	pass
 
 
+	# ===============================
+	# CONTROLLERS
+	# ===============================
 
-	def instantiate_airport_constructor(self) -> Airport:
-		airport = Airport(doctype='Airport', **self.foo_dict)
-		return airport
+	def test_autoname_with_get_value(self):
+		"""Assumes that room calls frappe.get_value()."""
+		expected_room_name = f"{self.common_data['airport_code']}{self.common_data['room_number']}"
 
-	@patch('airplane_mode.airport_leasing.doctype.room.test_room.Airport')
-	def test_patch_local_airport_constructor(self, MockAirport):
-		airport = self.instantiate_airport_constructor()
-		self.assert_(isinstance(airport, MockAirport))
+		with patch('frappe.get_value', return_value=self.common_data['airport_code']) as mock_get_value:
+			self.room.autoname()
+			with self.subtest("Autoname should use frappe.get_value()"):
+				mock_get_value.assert_called_once_with('Airport', self.room.airport, 'code')
 
-
-	#
-	# patch.object()
-	#
-	def test_patch_object_frappe(self):
-		with patch.object(Airport, 'uwu', return_value=None) as mock_method:
-			thing = frappe.new_doc('Airport', **self.foo_dict)
-			thing.uwu(1, 2, 3)
-			assert isinstance(thing, Airport)
-			assert isinstance(thing.uwu, Mock)
-			assert not isinstance(thing, Mock)
-		mock_method.assert_called_once_with(1, 2, 3)	
-		
-
-	def test_patch_object_constructor(self):
-		with patch.object(Airport, 'uwu', return_value=None) as mock_method:
-			thing = Airport(doctype='Airport', **self.foo_dict)
-			thing.uwu(1, 2, 3)
-			# True
-
-			assert isinstance(thing, Airport)
-			assert isinstance(thing.uwu, Mock)
-			assert not isinstance(thing, Mock)
-		mock_method.assert_called_once_with(1, 2, 3)
-
-	# NOTE Fails because it begins from toplevel.
-	# def test_patch_object_module_name(self):
-	# 	with patch('airport.Airport') as mock:
-	# 		instance = mock.return_value
-	# 		instance.uwu.return_value = 'the result'
-
-	# 		result = self.make_airport_uwu()
-	# 		self.assertEquals(result, 'the result')
+			with self.subtest("The result of autoname should follow {airport_code}{room_number}"):
+				self.assertEqual(self.room.name, expected_room_name)
 
 
-	# def tearDown(self):
-	# 	frappe.delete_doc_if_exists('Airport', self.airport.name, 1)
-	# 	frappe.delete_doc_if_exists('Room', self.room.name, 1)
+	# item_exists
+	def test_auto_rental_rate(self):
+		self.fail("Not Implemented")
+
+	# ===============================
+	# PUBLIC INSTANCE METHODS
+	# ===============================
+
+	def test_something(self):
+		with self.mock_frappe_calls() as mocks:
+			# Use the mocked functions
+			self.room.autoname()
+			mocks['get_value'].assert_called_once()
+
+	def test_create_item_called(self):
+		mock_item = Mock()
+		with patch('frappe.new_doc', return_value=mock_item) as mock_new_doc:
+			self.room.create_item()
+
+			with self.subtest("Item is created"):
+				mock_new_doc.assert_called_once()
+
+			with self.subtest("Item is saved to DB"):
+				mock_item.save.assert_called_once()
+
+	def test_on_submit(self):
+		"""A Unit Test-like approach that 
+		Patch both the instance method and the link validation.
+		An integration approach may be preferrable.
+		"""
+
+		with patch.object(Room, 'create_item') as mock_create_item, \
+			 patch('frappe.get_doc') as mock_get_doc:
+			# Setup mock airport for link validation
+			mock_airport = Mock()
+			mock_airport.name = 'TEST_AIRPORT'
+			mock_get_doc.return_value = mock_airport
+			
+			with patch.object(Room, 'item_exists', return_value=False):
+				self.room.on_submit()
+				mock_create_item.assert_called_once()
+
+TestRoomUnit.make_comprehensive_status_tests()
 
 
-	# def test_autoname(self):
-	# 	expected_room_name = f"{self.airplane_code}{self.room_number}"
-	# 	self.assertEqual(self.room.name, expected_room_name)
+class TestRoomIntegration(FrappeTestCase):
+	"""Integration Tests for Room.
+	Focus on using real documents."""
+	# ===============================
+	# FIXTURES
+	# ===============================
 
+	@classmethod
+	def setUpClass(cls):
+		"""Runs once before all test in the class"""
+		super().setUpClass()
 
-	# def test_item_created_with_default_rate(self):
-	# 	self.assertEqual(1,1)
-	# 	# default_rate = 5000
-	# 	# settings = frappe.get_doc('Airport Leasing Settings')
-	# 	# settings.default_rental_rate = default_rate
-	# 	# settings.save()
+		# Create shared test data that won't be modified by tests
+		cls.airport_data = {
+			'name': '_Test Airport',
+			'code': 'TST',
+			'country': 'TEST COUNTRY',
+			'city': 'TEST CITY'
+		}
+		cls.room_data = {
+			'airport': cls.airport_data['name'],
+			'room_number': 101,
+			'maintenance': False
+		}
 
-	# 	# # self.room.submit()
-	# 	# self.room.on_submit()
-	# 	# # Check that item exists
-	# 	# item_code = self.room.room_name()
-	# 	# item_exists = frappe.db.exists('Item', item_code)
-	# 	# if not item_exists:
-	# 	# 	self.fail('Item does not exist')
-	# 	# self.assertEqual(frappe.get_doc('Item', item_code).standard_rate, default_rate)
+	@classmethod
+	def tearDownClass(cls):
+		super().tearDownClass()
+		# Clean up any class-level resources.
+
+	def setUp(self):
+		"""Run before each test method"""
+		self.airport = frappe.new_doc('Airport', **self.airport_data).insert()
+		self.room = frappe.new_doc('Room', **self.room_data)
+
+	def tearDown(self):
+		self.airport.delete()
+
+	# ===============================
+	# CONTROLLERS
+	# ===============================
+
+	# Autoname
+	# Validate
+	# On Submit
+	# On Update After Submit
+	# Rental Rate
+
+	def test_autoname(self):
+		self.fail("Not Implemented")
+
+	def test_validate(self):
+		self.fail("Not Implemented")
+
+	def test_on_submit(self):
+		self.fail("Not Implemented")
+
+	def test_on_update_after_submit(self):
+		self.fail("Not Implemented")
+
+	def test_rental_rate(self):
+		self.fail("Not Implemented")
+
+	# ===============================
+	# PUBLIC INSTANCE METHODS
+	# ===============================
+
+	# Auto Rental Rate
+	# Item Exists
+	# Create Item
+	# Set Status
+
+	def test_auto_rental_rate(self):
+		self.fail("Not Implemented")
+
+	def test_item_exists(self):
+		self.fail("Not Implemented")
+
+	def test_create_item(self):
+		self.fail("Not Implemented")
+
+	def test_set_status(self):
+		self.fail("Not Implemented")
 
