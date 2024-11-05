@@ -7,6 +7,11 @@ import json
 from frappe.model.document import Document
 
 class Lease(Document):
+	RENEWAL_BUFFER_DAYS = 14
+	PERIOD_WEEKS = {
+		'Monthly': 4,
+		'Quarterly': 12
+	}
 	# begin: auto-generated types
 	# This code is auto-generated. Do not modify anything in this block.
 
@@ -131,14 +136,7 @@ class Lease(Document):
 
 	def period_weeks(self) -> int:
 		"""Get number of weeks for this lease's period length."""
-		from typing_extensions import assert_never
-		match self.period_length:
-			case 'Monthly':
-				return 4
-			case 'Quarterly':
-				return 12
-			case _:
-				assert_never(self.period_length)
+		return self.PERIOD_WEEKS[self.period_length]
 
 	def unpaid_periods(self) -> list[dict]:
 		if not self.periods:
@@ -217,9 +215,9 @@ class Lease(Document):
 	@staticmethod
 	def calculate_renewal_buffer(period_end: DF.Date) -> DF.Date:
 		"""
-		Calculate the date 14 days before the period ends.
+		Calculate the date RENEWAL_BUFFER_DAYS before the period ends.
 		"""
-		return frappe.utils.add_days(period_end, -14)
+		return frappe.utils.add_days(period_end, -Lease.RENEWAL_BUFFER_DAYS)
 
 
 	@staticmethod
