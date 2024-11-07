@@ -1,0 +1,56 @@
+{
+ "add_total_row": 0,
+ "columns": [
+  {
+   "fieldname": "room_name",
+   "fieldtype": "Link",
+   "label": "Room Name",
+   "options": "Room",
+   "width": 0
+  },
+  {
+   "fieldname": "shop_name",
+   "fieldtype": "Link",
+   "label": "Shop Name",
+   "options": "Shop",
+   "width": 0
+  },
+  {
+   "fieldname": "airport_name",
+   "fieldtype": "Link",
+   "label": "Airport Name",
+   "options": "Airport",
+   "width": 0
+  },
+  {
+   "fieldname": "room_status",
+   "fieldtype": "Data",
+   "label": "Room Status",
+   "width": 0
+  }
+ ],
+ "creation": "2024-11-07 15:45:57.096091",
+ "disabled": 0,
+ "docstatus": 0,
+ "doctype": "Report",
+ "filters": [],
+ "idx": 0,
+ "is_standard": "Yes",
+ "json": "{}",
+ "letterhead": null,
+ "modified": "2024-11-07 16:13:35.993522",
+ "modified_by": "Administrator",
+ "module": "Airport Leasing",
+ "name": "Shops per Airport",
+ "owner": "Administrator",
+ "prepared_report": 0,
+ "query": "SELECT\n    distinct(room.name) as \"room_name\",\n    lease.leased_to as \"shop_name\",\n    room.airport as \"airport_name\",\n    room.status as \"room_status\"\nFROM\n    tabLease lease\n    JOIN tabRoom room ON lease.leasing_of = room.name\nORDER BY\n    airport_name,\n    room_name",
+ "ref_doctype": "Airport",
+ "report_name": "Shops per Airport",
+ "report_type": "Query Report",
+ "roles": [
+  {
+   "role": "System Manager"
+  }
+ ]
+}
