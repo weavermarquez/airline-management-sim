@@ -7,41 +7,21 @@ from frappe.query_builder.functions import Count
 from pypika.terms import Case
 
 def execute(filters=None):
-	col_a, rooms = room_count(filters)
-	col_b, shops = shop_count(filters)
-	columns = col_a + col_b
+	columns_room, rooms = room_count(filters)
+	columns_shop, shops = shop_count(filters)
+	columns = columns_room + columns_shop
 
 	query = (
 		frappe.qb
 		.from_(rooms)
 		.join(shops)
 		.on_field('airport_name')
-		# .on(rooms.airport_name == shops.airport_name)
 		.select(
 			rooms.star,
 			shops.shop_count
 		)
 	)
 
-	# DONE Find a way to avoid having to bring in a Pypika Table.
-	# Attempting to use .on(rooms.airport_name == shops.airport_name) 
-	# or .on_field('airport_name') did not work.
-	# https://github.com/kayak/pypika/issues/755
-
-	# Turns out it just needs to be through frappe.qb rather than one of the preexisting queries.
-
-	# Airport = DocType("Airport")
-	# query = (
-	# 	rooms
-	# 	.join(shops)
-	# 	# .on(Airport.name == shops.airport_name)
-	# 	.on(rooms.airport_name == shops.airport_name)
-	# 	.select(
-	# 		shops.shop_count,
-	# 	)
-	# )
-
-	frappe.log(query.walk())
 	results = query.run()
 
 	return columns, results
@@ -56,7 +36,7 @@ def room_count(filters=None):
 		},
 		{
 			'fieldname': 'available_rooms',
-			'label': 'Available Rooms',
+			'label': 'Available/Reserved Rooms',
 			'fieldtype': 'Int',
 		},
 		{
@@ -83,11 +63,11 @@ def room_count(filters=None):
 			Airport.name.as_("airport_name"),
 			Count(Case()
 				.when((Room.status == 'Available') | (Room.status == 'Reserved'), 1)
-		  		.else_(None)).as_("Available/Reserved Rooms"),
+		  		.else_(None)).as_("available_rooms"),
 			Count(Case()
 				.when(Room.status == 'Occupied', 1)
-				.else_(None)).as_("Occupied Rooms"),
-			Count(Room.name).as_("Total Rooms"),
+				.else_(None)).as_("occupied_rooms"),
+			Count(Room.name).as_("total_rooms"),
 		)
 		.where(Room.docstatus==1)
 		.groupby(Airport.name)
