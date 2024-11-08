@@ -166,16 +166,6 @@ class Lease(Document):
 		# This will cause the "Saved after opening Error.""
 
 
-	def offboard(self) -> None:
-		"""Begin lease termination process."""
-		self.status = 'Offboarding'
-		self.save()
-
-	def terminate(self) -> None:
-		"""Finalize lease termination process."""
-		self.status = 'Terminated'
-		self.cancel()
-
 	def period_weeks(self) -> int:
 		"""Get number of weeks for this lease's period length."""
 		return self.PERIOD_WEEKS[self.period_length]
@@ -220,17 +210,16 @@ class Lease(Document):
 			frappe.log_error(f"Failed to process payment: {str(e)}")
 			frappe.throw("Failed to process payment. Please try again or contact support.")
 
-	def set_status(self, update=False, update_modified=True) -> None:
-		if not self.docstatus.is_submitted():
-			return
-
-		if any(period.status.startswith('Overdue') for period in self.periods):
-			self.status = "Overdue"
+	def set_status(self, *, status=None, update=False, update_modified=True) -> None:
+		if not status or not self.docstatus.is_submitted():
+			status = self.status
+		elif any(period.status.startswith('Overdue') for period in self.periods):
+			status = "Overdue"
 		else:
-			self.status = "Active"
+			status = "Active"
 
 		if update:
-			self.db_set("status", self.status, update_modified=update_modified)
+			self.db_set("status", status, update_modified=update_modified)
 
 
 	# ==================== 
@@ -249,7 +238,7 @@ class Lease(Document):
 		lease: Lease = frappe.get_doc(json.loads(doc))
 		today = frappe.utils.today()
 
-		lease.set_status(update=True, update_modified=False)
+		lease.set_status(update_modified=False)
 
 		if any((lease.next_date != today, lease.docstatus.is_draft(), lease.docstatus.is_cancelled())):
 			return
@@ -257,9 +246,9 @@ class Lease(Document):
 		expiring_soon = Lease.calculate_renewal_buffer(lease.end_date) <= today
 		if lease.status == 'Offboarding' and lease.end_date == today:
 			# TODO Handle offboarding logic here if needed
-			return lease.terminate()
+			return lease.set_status(status='Terminated', update=True)
 		elif expiring_soon:
-			return lease.offboard()
+			return lease.set_status(status='Offboarding', update=True)
 		else:
 			return lease.next_period()
 
