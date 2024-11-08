@@ -227,8 +227,8 @@ class Lease(Document):
 		# 	return lease.set_status(status='Terminated', update=True)
 		# elif expiring_soon:
 		# 	return lease.set_status(status='Offboarding', update=True)
-
-		self.status = status
+		if status:
+			self.status = status
 
 		frappe.log_error(f'set_status({self.status}, {status}, {update})')
 		if update:
