@@ -145,7 +145,7 @@ class Room(Document):
 			self.status = "Available"
 
 		if update:
-			self.db_set("status", self.status, update_modified=True)
+			self.db_set("status", self.status, update_modified=True, notify=True, commit=True)
 
 	
 # TODO Fix the fragility of this function with try / except.

@@ -211,15 +211,28 @@ class Lease(Document):
 			frappe.throw("Failed to process payment. Please try again or contact support.")
 
 	def set_status(self, *, status=None, update=False, update_modified=True) -> None:
-		if not status or not self.docstatus.is_submitted():
-			status = self.status
-		elif any(period.status.startswith('Overdue') for period in self.periods):
-			status = "Overdue"
-		else:
-			status = "Active"
+		if not self.docstatus.is_submitted():
+			if status:
+				self.status = status
+			return
 
+		if any(period.status.startswith('Overdue') for period in self.periods):
+			self.status = "Overdue"
+		else:
+			self.status = "Active"
+
+	 	# TODO Move offboarding logic here if needed
+		# expiring_soon = Lease.calculate_renewal_buffer(lease.end_date) <= today
+		# if lease.status == 'Offboarding' and lease.end_date == today:
+		# 	return lease.set_status(status='Terminated', update=True)
+		# elif expiring_soon:
+		# 	return lease.set_status(status='Offboarding', update=True)
+
+		self.status = status
+
+		frappe.log_error(f'set_status({self.status}, {status}, {update})')
 		if update:
-			self.db_set("status", status, update_modified=update_modified)
+			self.db_set("status", self.status, update_modified=update_modified, notify=True, commit=True)
 
 
 	# ==================== 
