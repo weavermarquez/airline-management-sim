@@ -151,7 +151,7 @@ class Lease(Document):
 
 	@property
 	def rental_rate(self):
-		return frappe.get_cached_doc('Room', self.leasing_of).auto_rental_rate()
+		return frappe.get_cached_doc('Room', self.leasing_of).rental_rate
 
 	# ==================== 
 	# PUBLIC INSTANCE METHODS

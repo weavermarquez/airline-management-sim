@@ -65,7 +65,7 @@ class Room(Document):
 
 	@property
 	def rental_rate(self) -> float:
-		return frappe.get_doc('Airport Leasing Settings').default_rental_rate
+		return self.auto_rental_rate()
 
 	# ==================== 
 	# PUBLIC INSTANCE METHODS
@@ -80,7 +80,7 @@ class Room(Document):
 		if self.rental_rate_override:
 			return self.rental_rate_override
 		else:
-			return self.rental_rate
+			return frappe.get_doc('Airport Leasing Settings').default_rental_rate
 
 	def item_exists(self) -> Optional[str]:
 		return frappe.db.exists('Item', self.name)
@@ -91,7 +91,7 @@ class Room(Document):
 			'item_group' : Room.ITEM_GROUP,
 			'stock_uom' : Room.UOM,
 			'sales_uom' : Room.UOM,
-			'standard_rate' : self.auto_rental_rate(),
+			'standard_rate' : self.rental_rate,
 			'is_stock_item' : 0,
 			'is_purchase_item' : 0,
 			'grant_commission' : 0,
