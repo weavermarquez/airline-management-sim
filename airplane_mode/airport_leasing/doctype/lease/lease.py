@@ -251,7 +251,7 @@ class Lease(Document):
 
 		lease.set_status(update=True, update_modified=False)
 
-		if any(lease.next_date != today, lease.docstatus.is_draft(), lease.docstatus.is_cancelled()):
+		if any((lease.next_date != today, lease.docstatus.is_draft(), lease.docstatus.is_cancelled())):
 			return
 		
 		expiring_soon = Lease.calculate_renewal_buffer(lease.end_date) <= today
