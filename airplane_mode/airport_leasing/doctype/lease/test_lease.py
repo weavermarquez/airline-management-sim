@@ -221,9 +221,66 @@ class TestLeaseUnit(FrappeTestCase):
 	# ===============================
 
 	def test_validate(self):
+		"""Validation Tests.
+		Room [draft, submitted, cancelled]
+		Room [
+		Available, Reserved, :: True for Draft
+		  Occupied, Maintenance :: True for Submit
+		Draft, Cancelled :: False
+		]
+		start_date < end_date
+
+		minimum_period
+		duration is at least minimum_end
+
+		backdated recently
+		today < start_date - PERIOD
+		"""
 		self.lease.docstatus = 1
+		JUNE = "2024-06-01"
+		BACKDATE_ONE_WEEK = "2024-05-01"
+		BACKDATE_ONE_MONTH = "2024-05-01"
+		BACKDATE_TWO_MONTH = "2024-04-01"
+		BACKDATE_FOUR_MONTH = "2024-04-01"
+		AFTER_ONE_WEEK = "2024-06-08"
+		AFTER_FIVE_WEEK = "2024-07-06"
+		AFTER_FOUR_MONTH = "2024-10-01"
+
+		DRAFT = 0
+		SUBMITTED = 1
+		CANCELLED = 2
+		from airplane_mode.airport_leasing.doctype.room.room import Room
+		SUBMITTED_STATUS = Room.LEASE_DRAFT_ROOM_STATUS	
+
+		validation_cases = [
+			{
+				"case_name": "Backdate Fail",
+				"expected_success": 4,
+				"expected_fail": 1,
+				"room_docstatus": SUBMITTED,
+				"room_status": 'S',
+				"period_length": '',
+				"today": JUNE, 
+				"start_date": JUNE,
+				"end_date": BACKDATE_ONE_WEEK,
+			},
+			{
+				"case_name": "Backdate Succeed",
+				"expected_success": 5,
+				"expected_fail": 0,
+				"room_docstatus": '1',
+				"room_status": 'Draft',
+				"period_length": '',
+				"today": JUNE, 
+				"start_date": JUNE,
+				"end_date": BACKDATE_ONE_WEEK,
+			},
+		]
 
 		self.fail("This should be covered by a number of cases.")
+
+	def _test_validate_backdated_recently(self):
+		self.assertTrue(self.lease._validate_backdated_recently())
 
 	def test_before_submit(self):
 		self.fail("Unit: check that it calls next_period. \
