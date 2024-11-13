@@ -38,7 +38,7 @@ class LeasePeriod(Document):
 
 	def validate(self) -> None:
 		"""Validate lease period dates and invoice"""
-		if all(self.start_date, self.end_date, self.start_date > self.end_date):
+		if all((self.start_date, self.end_date, self.start_date > self.end_date)):
 			frappe.throw('Start date cannot be after end date')
 		
 		if self.invoice and not frappe.db.exists('Sales Invoice', self.invoice):

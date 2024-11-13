@@ -4,6 +4,32 @@ from unittest.mock import patch, Mock, MagicMock
 from datetime import date
 from airplane_mode.airport_leasing.doctype.lease_period.lease_period import LeasePeriod
 
+class TestLeasePeriodUnit(FrappeTestCase):
+	"""Unit Tests for Lease Period.
+	Focuses on mocking static and public instance methods with mocks."""
+
+	# ===============================
+	# CONTROLLERS
+	# ===============================
+	# Validate
+	# Status
+
+	# ===============================
+	# STATIC METHODS
+	# ===============================
+
+
+	def test_next_period(self):
+		self.fail("Several test cases..?")
+
+
+	def test_new_invoice_item(self):
+		self.fail("Several test cases..?")
+
+
+	def test_new_sales_invoice(self):
+		self.fail("Several test cases..?")
+
 class TestLeasePeriod(FrappeTestCase):
 
 	@classmethod
@@ -88,3 +114,4 @@ class TestLeasePeriod(FrappeTestCase):
 			
 			# Verify invoice creation
 			mock_new_invoice.assert_called_once()
+
