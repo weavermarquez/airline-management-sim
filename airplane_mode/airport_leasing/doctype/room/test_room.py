@@ -125,7 +125,7 @@ class TestRoomUnit(FrappeTestCase):
 
 
 	@classmethod
-	def _add_test(cls, case_number, case):
+	def _add_status_test(cls, case_number, case):
 		def mock_get_all(doctype, filters=None):
 			docstatus = filters.get('docstatus')[1]
 			draft_active_leases = {
@@ -138,6 +138,7 @@ class TestRoomUnit(FrappeTestCase):
 		def test_method(self):
 			self.room.maintenance = case['maintenance']
 			self.room.docstatus = case['docstatus']
+
 			self.room.set_status(update=False)
 
 			self.assertEqual(
@@ -153,7 +154,7 @@ class TestRoomUnit(FrappeTestCase):
 	def make_comprehensive_status_tests(cls):
 		test_cases = TestRoomUnit.status_cases()
 		for case_number, case in enumerate(test_cases):
-			cls._add_test(case_number, case)
+			cls._add_status_test(case_number, case)
 
 
 	# def test_set_status_comprehensive(self):
