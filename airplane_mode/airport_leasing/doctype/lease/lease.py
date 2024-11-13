@@ -229,11 +229,6 @@ class Lease(Document):
 		Args:
 			update (bool): If True, updates the status in the database
 		"""
-		"""Modify lease status based on current circumstances.
-		Args:
-		filter_unpaid: If True, only consider unpaid periods
-	
-		"""
 		if not self.docstatus.is_submitted():
 			if status:
 				self.status = status
