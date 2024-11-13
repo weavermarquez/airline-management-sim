@@ -211,6 +211,29 @@ class Lease(Document):
 			frappe.throw("Failed to process payment. Please try again or contact support.")
 
 	def set_status(self, *, status=None, update=False, update_modified=True) -> None:
+		"""Modify lease status based on child periods and end_date.
+
+		Status values:
+		- Draft: On create and before submit.
+		- Active: Lease Period Invoices are in good standing
+		- Overdue: One or more Invoices are not in good standing -- considered Overdue.
+		- Offboarding: Lease end_date is within 2 weeks.
+		- Terminated: Lease end_date is today, and invoices are in good standing.
+		- Cancelled: Lease end_date is today, and invoices are not in good standing.
+
+		- Maintenance: Room is under maintenance
+		- Occupied: Room has active (submitted) leases
+		- Reserved: Room has draft leases
+		- Available: Room has no leases and is not under maintenance
+		
+		Args:
+			update (bool): If True, updates the status in the database
+		"""
+		"""Modify lease status based on current circumstances.
+		Args:
+		filter_unpaid: If True, only consider unpaid periods
+	
+		"""
 		if not self.docstatus.is_submitted():
 			if status:
 				self.status = status
@@ -243,12 +266,16 @@ class Lease(Document):
 	def total_weeks(start_date: DF.Date, end_date: DF.Date) -> float:
 		days = frappe.utils.date_diff(end_date, start_date)
 		return days / 7	
+	
+	@staticmethod
+	def retrieve_doc(doc: str) -> 'Lease':
+		return frappe.get_doc(json.loads(doc))
 
 	@staticmethod
 	def autorenew(doc: str) -> None:
 		"""On next_date, prepare a new Lease Period or end the lease.
 		The next_date can be within one period of the thingy."""
-		lease: Lease = frappe.get_doc(json.loads(doc))
+		lease: Lease = Lease.retrieve_doc(doc)
 		today = frappe.utils.today()
 
 		lease.set_status(update_modified=False)
@@ -256,8 +283,10 @@ class Lease(Document):
 		if any((lease.next_date != today, lease.docstatus.is_draft(), lease.docstatus.is_cancelled())):
 			return
 		
+		ends_today = lease.end_date == today
 		expiring_soon = Lease.calculate_renewal_buffer(lease.end_date) <= today
-		if lease.status == 'Offboarding' and lease.end_date == today:
+
+		if ends_today:
 			# TODO Handle offboarding logic here if needed
 			return lease.set_status(status='Terminated', update=True)
 		elif expiring_soon:
