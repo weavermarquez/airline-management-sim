@@ -138,23 +138,23 @@ app_license = "mit"
 # Scheduled Tasks
 # ---------------
 
-# scheduler_events = {
-# 	"all": [
-# 		"airplane_mode.tasks.all"
-# 	],
-# 	"daily": [
-# 		"airplane_mode.tasks.daily"
-# 	],
-# 	"hourly": [
-# 		"airplane_mode.tasks.hourly"
-# 	],
-# 	"weekly": [
-# 		"airplane_mode.tasks.weekly"
-# 	],
-# 	"monthly": [
-# 		"airplane_mode.tasks.monthly"
-# 	],
-# }
+scheduler_events = {
+	# "all": [
+	# 	"airplane_mode.tasks.all"
+	# ],
+	"daily": [
+		"airplane_mode.airport_leasing.doctype.lease.lease.autorenew_daily"
+	],
+	# "hourly": [
+	# 	"airplane_mode.tasks.hourly"
+	# ],
+	# "weekly": [
+	# 	"airplane_mode.tasks.weekly"
+	# ],
+	"monthly": [
+		"airplane_mode.airport_leasing.doctype.lease.lease.send_reminder_monthly",
+	],
+}
 
 # Testing
 # -------

@@ -194,8 +194,9 @@ class Lease(Document):
 		return max(periods, key=lambda period: period.start_date) if periods else None
 
 
-	def remind_tenant(self):
-		pass
+	def send_reminder(self) -> None:
+		"""Use lease.run_method('send_reminder') to email tenant monthly rent reminder."""
+		return
 
 	@frappe.whitelist()
 	def receive_payment(self, amount: DF.Currency, reference_no: DF.Data):
@@ -275,6 +276,7 @@ class Lease(Document):
 
 		lease.set_status(update_modified=False)
 
+		# NOTE I can pre-filter all the leases in the daily scan, so this may be redundant.
 		if any((lease.next_date != today, lease.docstatus.is_draft(), lease.docstatus.is_cancelled())):
 			return
 		
@@ -350,9 +352,24 @@ def get_filtered_child_rows(doctype, txt, searchfield, start, page_len, filters)
 
 	return query.run(as_dict=False)
 
-@frappe.whitelist()
-def send_payment_reminders() -> None:
-	"""app.scheduled_tasks.update_database_usage"""
-	def create_rent_reminder(self):
-		pass
-	pass
+def autorenew_daily() -> None:
+	"""Run autorenew on all Submitted leases daily"""
+	fields = ['name']
+	filters = [ [["docstatus"], ['='], [1]],
+			[["next_date"], ['='], [frappe.utils.today()]] ]
+
+	for lease in frappe.get_all("Lease", fields=fields, filters=filters):
+		Lease.run_method('autorenew', frappe.get_doc('Lease', lease.name).as_json())
+
+def send_reminder_monthly() -> None:
+	"""Check lease rent reminders to be sent monthly"""
+	enabled = frappe.get_single('Airport Leasing Settings').enable_payment_reminders
+	if not enabled:
+		return
+
+	fields = ['name']
+	filters = [ [["docstatus"], ['='], [1]],
+			 [['outstanding_balance'], [">"], [0]] ]
+
+	for lease in frappe.get_all("Lease", fields=fields, filters=filters):
+		frappe.get_doc('Lease', lease.name).run_method('send_reminder')

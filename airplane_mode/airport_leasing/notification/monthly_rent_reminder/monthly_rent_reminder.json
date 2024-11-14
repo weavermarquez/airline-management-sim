@@ -1,0 +1,35 @@
+{
+ "attach_print": 0,
+ "channel": "Email",
+ "condition": "",
+ "creation": "2024-11-13 18:17:52.605840",
+ "days_in_advance": 0,
+ "docstatus": 0,
+ "doctype": "Notification",
+ "document_type": "Lease",
+ "enabled": 1,
+ "event": "Method",
+ "idx": 0,
+ "is_standard": 1,
+ "message": "<p>Your Rent is Due</p>\n",
+ "message_type": "Markdown",
+ "method": "send_reminder",
+ "modified": "2024-11-13 20:48:36.399527",
+ "modified_by": "Administrator",
+ "module": "Airport Leasing",
+ "name": "Monthly Rent Reminder",
+ "owner": "Administrator",
+ "recipients": [
+  {
+   "receiver_by_document_field": "",
+   "receiver_by_role": "Customer"
+  },
+  {
+   "receiver_by_document_field": "owner",
+   "receiver_by_role": "System Manager"
+  }
+ ],
+ "send_system_notification": 1,
+ "send_to_all_assignees": 0,
+ "subject": "{{ doc.name }} Rent Reminder"
+}
