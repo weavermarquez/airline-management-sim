@@ -51,6 +51,12 @@ class Lease(Document):
 	# ==================== 
 	# CONTROLLERS 
 	# ====================
+
+	@staticmethod
+	def _chronological(earlier, later) -> bool:
+		"""True if later is equal to or later than earlier"""
+		return frappe.utils.date_diff(later, earlier) >= 0
+
 	def _validate_room_submitted(self) -> bool:
 		"""The room being leased out should be finalized and submitted"""
 		message = "The room being leased out should be finalized and submitted"
@@ -68,20 +74,20 @@ class Lease(Document):
 	def _validate_dates(self) -> bool:
 		"""Start date should be before end date."""
 		message = "Start date should be before end date."
-		is_valid = self.start_date < self.end_date
+		is_valid = Lease._chronological(self.start_date, self.end_date)
 		return is_valid, message
 
 	def _validate_minimum_one_period(self) -> bool:
 		"""Check if duration is at least one period."""
 		minimum_end = frappe.utils.add_to_date(self.start_date, weeks=self.period_weeks())
-		is_valid = minimum_end <= self.end_date
+		is_valid = Lease._chronological(minimum_end, self.end_date)
 		message = f"Duration of lease should be at least 1 period. Please choose a start date later than {minimum_end}"
 		return is_valid, message
 
 	def _validate_backdated_recently(self) -> bool:
 		"""Check if start date is within one period of today."""
 		earliest_backdate = frappe.utils.add_to_date(frappe.utils.today(), weeks=-self.period_weeks())
-		is_valid = earliest_backdate < self.start_date
+		is_valid = Lease._chronological(earliest_backdate, self.start_date)
 		message = f"If start date is backdated, it must have been within one period. Please choose an end date later than {earliest_backdate}"
 		return is_valid, message 
 
