@@ -51,55 +51,64 @@ class Lease(Document):
 	# ==================== 
 	# CONTROLLERS 
 	# ====================
-	def _validate_room_submitted(self) -> bool:
-		"""The room being leased out should be finalized and submitted"""
-		message = "The room being leased out should be finalized and submitted"
-		is_valid = frappe.get_value('Room', self.leasing_of, 'docstatus') == 1
-		return is_valid, message
 
-	def _validate_room_status(self, on_submit=False) -> bool:
-		"""Room must be valid when adding to any new leases."""
+	def _validate_room_submitted(self) -> None:
+		"""The room being leased must be finalized and submitted"""
+		# Alternative version:
+		# room = frappe.get_cached_doc('Room', self.leasing_of)
+		# room.validate_value('docstatus', '=', 1, room, raise_exception=True)
+		room_submitted = frappe.get_value('Room', self.leasing_of, 'docstatus') == 1
+		if room_submitted:
+			return
+
+		frappe.throw(
+			("{0} must be submitted and finalized").format(
+				frappe.bold(self.meta.get_label('leasing_of'))
+			),
+			frappe.exceptions.LinkValidationError,
+		)
+
+	def _validate_room_status(self, on_submit=False) -> None:
+		"""When adding to a draft Lease, Room must not be Draft or Cancelled.
+		When finalizing a Lease, the Room must be Available or Reserved."""
 		from airplane_mode.airport_leasing.doctype.room.room import Room
-		message = "Room must be valid when adding to any new leases."
-		valid_status = Room.LEASE_DRAFT_ROOM_STATUS if not on_submit else Room.LEASE_SUBMIT_ROOM_STATUS
-		is_valid = frappe.get_value('Room', self.leasing_of, 'status') in valid_status
-		return is_valid, message
 
-	def _validate_dates(self) -> bool:
-		"""Start date should be before end date."""
-		message = "Start date should be before end date."
-		is_valid = self.start_date < self.end_date
-		return is_valid, message
+		required_status = Room.LEASE_DRAFT_ROOM_STATUS if not on_submit else Room.LEASE_SUBMIT_ROOM_STATUS
+		self.validate_value('leasing_of', 'in', Room.LEASE_DRAFT_ROOM_STATUS, raise_exception=True)
+
+	@staticmethod
+	def _validate_from_to(from_date, to_date) -> None:
+		"""Ensure from_date is before to_date. Like doc.validate_from_to_dates, but works for non-fields."""
+		if not (from_date and to_date):
+			return
+
+		if frappe.utils.date_diff(to_date, from_date) < 0:
+			frappe.throw(
+				("{0} must be after {1}").format(
+					frappe.bold(to_date),
+					frappe.bold(from_date),
+				),
+				frappe.exceptions.InvalidDates,
+			)
 
 	def _validate_minimum_one_period(self) -> bool:
-		"""Check if duration is at least one period."""
+		"""Ensure lease duration is at least one period."""
 		minimum_end = frappe.utils.add_to_date(self.start_date, weeks=self.period_weeks())
-		is_valid = minimum_end <= self.end_date
-		message = f"Duration of lease should be at least 1 period. Please choose a start date later than {minimum_end}"
-		return is_valid, message
+		Lease._validate_from_to(minimum_end, self.end_date)
 
 	def _validate_backdated_recently(self) -> bool:
 		"""Check if start date is within one period of today."""
 		earliest_backdate = frappe.utils.add_to_date(frappe.utils.today(), weeks=-self.period_weeks())
-		is_valid = earliest_backdate < self.start_date
-		message = f"If start date is backdated, it must have been within one period. Please choose an end date later than {earliest_backdate}"
-		return is_valid, message 
+		Lease._validate_from_to(earliest_backdate, self.start_date)
 
 	def validate(self) -> None:
 		room: Room = frappe.get_doc('Room', self.leasing_of)
 
-		validations = [
-			self._validate_room_submitted,
-			self._validate_room_status,
-			self._validate_dates,
-			self._validate_minimum_one_period,
-			self._validate_backdated_recently,
-		]
-
-		for validator in validations:
-			is_valid, message = validator()
-			if not is_valid:
-				frappe.throw(message)
+		self._validate_room_submitted()
+		self._validate_room_status()
+		self.validate_from_to_dates('start_date', 'end_date')
+		self._validate_minimum_one_period()
+		self._validate_backdated_recently()
 
 		self.set_status(update=True)
 
@@ -115,6 +124,7 @@ class Lease(Document):
 		room.set_status(update=True)
 
 	def on_update_after_submit(self) -> None:
+		# NOTE You can also use: validate_table_has_rows
 		room = frappe.get_doc('Room', self.leasing_of)
 		room.set_status(update=True)
 	
@@ -194,8 +204,9 @@ class Lease(Document):
 		return max(periods, key=lambda period: period.start_date) if periods else None
 
 
-	def remind_tenant(self):
-		pass
+	def send_reminder(self) -> None:
+		"""Use lease.run_method('send_reminder') to email tenant monthly rent reminder."""
+		return
 
 	@frappe.whitelist()
 	def receive_payment(self, amount: DF.Currency, reference_no: DF.Data):
@@ -275,6 +286,7 @@ class Lease(Document):
 
 		lease.set_status(update_modified=False)
 
+		# NOTE I can pre-filter all the leases in the daily scan, so this may be redundant.
 		if any((lease.next_date != today, lease.docstatus.is_draft(), lease.docstatus.is_cancelled())):
 			return
 		
@@ -350,9 +362,30 @@ def get_filtered_child_rows(doctype, txt, searchfield, start, page_len, filters)
 
 	return query.run(as_dict=False)
 
-@frappe.whitelist()
-def send_payment_reminders() -> None:
-	"""app.scheduled_tasks.update_database_usage"""
-	def create_rent_reminder(self):
-		pass
-	pass
+def autorenew_daily() -> None:
+	"""Run autorenew on all Submitted leases daily"""
+	fields = ['name']
+	filters = [
+		["docstatus", '=', 1], 
+		["next_date", '=', frappe.utils.today()],
+	]
+
+	for lease in frappe.get_all("Lease", fields=fields, filters=filters):
+		doc_json = frappe.get_doc('Lease', lease.name).as_json()
+		Lease.run_method('autorenew', doc_json)
+
+def send_reminder_monthly() -> None:
+	"""Check lease rent reminders to be sent monthly"""
+	enabled = frappe.get_single('Airport Leasing Settings').enable_payment_reminders
+	if not enabled:
+		return
+
+	fields = ['name']
+	filters = [
+		["docstatus", '=', 1], 
+		# ['outstanding_balance', ">", 0], 
+		# NOTE I could use status == Overdue. But frankly just every active lease is fine.
+	]
+
+	for lease in frappe.get_all("Lease", fields=fields, filters=filters):
+		frappe.get_doc('Lease', lease.name).run_method('send_reminder')

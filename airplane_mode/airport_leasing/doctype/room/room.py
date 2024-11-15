@@ -80,7 +80,7 @@ class Room(Document):
 		if self.rental_rate_override:
 			return self.rental_rate_override
 		else:
-			return frappe.get_doc('Airport Leasing Settings').default_rental_rate
+			return frappe.get_single('Airport Leasing Settings').default_rental_rate
 
 	def item_exists(self) -> Optional[str]:
 		return frappe.db.exists('Item', self.name)
