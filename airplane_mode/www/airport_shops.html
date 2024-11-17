@@ -1,19 +1,32 @@
+---
+title: Airport Shop Directory
+no_header: True
+no_cache: 1
+metatags:
+  description: Shop directory for Airports
+---
+
 {% extends "templates/web.html" %}
 
 {% block page_content %}
 
 
 <h1>{{ title }}</h1>
+<h2>List of Shops</h2>
 <menu>
-<li>{{ airport_leasing_settings.default_rental_rate }}</li>
     {% for shop in shops %}
     <li>
-        <strong>Name:</strong> {{ shop.name }}<br>
-        <strong>Owner:</strong> {{ shop.owned_by }}<br>
-        <strong>Shop Number:</strong> {{ shop.shop_number }}
-    </li>
+        <strong>{{ shop.name }}</strong>
+        <i>{{ shop.shop_type }}</i> 
+        <br>
+        {# {{ airport(shop.rooms[0]) }} #}
+        Located at: <strong>{{ shop.rooms|join(', ') }}</strong>
+        <br>
+        {{ get_desk_link(shop) }}
+    </li><br>
     {% endfor %}
 </menu>
+
 {% endblock %}
 
 <!-- this is a sample default web page template -->
