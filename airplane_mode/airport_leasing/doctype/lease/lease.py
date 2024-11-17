@@ -52,29 +52,17 @@ class Lease(Document):
 	# CONTROLLERS 
 	# ====================
 
-	def _validate_room_submitted(self) -> None:
-		"""The room being leased must be finalized and submitted"""
-		# Alternative version:
-		# room = frappe.get_cached_doc('Room', self.leasing_of)
-		# room.validate_value('docstatus', '=', 1, room, raise_exception=True)
-		room_submitted = frappe.get_value('Room', self.leasing_of, 'docstatus') == 1
-		if room_submitted:
-			return
-
-		frappe.throw(
-			("{0} must be submitted and finalized").format(
-				frappe.bold(self.meta.get_label('leasing_of'))
-			),
-			frappe.exceptions.LinkValidationError,
-		)
-
 	def _validate_room_status(self, on_submit=False) -> None:
 		"""When adding to a draft Lease, Room must not be Draft or Cancelled.
 		When finalizing a Lease, the Room must be Available or Reserved."""
 		from airplane_mode.airport_leasing.doctype.room.room import Room
 
+		room = frappe.get_cached_doc('Room', self.leasing_of)
 		required_status = Room.LEASE_DRAFT_ROOM_STATUS if not on_submit else Room.LEASE_SUBMIT_ROOM_STATUS
-		self.validate_value('leasing_of', 'in', Room.LEASE_DRAFT_ROOM_STATUS, raise_exception=True)
+
+		self.validate_value('status', 'in', required_status, doc=room, raise_exception=True)
+		# NOTE This doesn't work for docstatus 
+		# as it is not explicitly defined in the DocType.
 
 	@staticmethod
 	def _validate_from_to(from_date, to_date) -> None:
@@ -104,7 +92,6 @@ class Lease(Document):
 	def validate(self) -> None:
 		room: Room = frappe.get_doc('Room', self.leasing_of)
 
-		self._validate_room_submitted()
 		self._validate_room_status()
 		self.validate_from_to_dates('start_date', 'end_date')
 		self._validate_minimum_one_period()
@@ -114,9 +101,7 @@ class Lease(Document):
 
 	def before_submit(self) -> None:
 		"""Upon finalizing Lease, start the first Lease Period"""
-		is_valid, message = self._validate_room_status(on_submit=True)
-		if not is_valid:
-			frappe.throw(message)
+		self._validate_room_status(on_submit=True)
 		self.next_period()
 
 	def on_submit(self) -> None:

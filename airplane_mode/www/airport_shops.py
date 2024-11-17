@@ -1,17 +1,29 @@
 import frappe
 from airplane_mode.airport_leasing.doctype.shop.shop import Shop
-no_cache = 1
 
 def get_context(context) -> dict:
-    context.title = "OwO Airport Storefronts"
-    context.show_sidebar = True
-    context.airport_leasing_settings = frappe.get_doc('Airport Leasing Settings')
-    context.shops = retrieve_shops()
+    context.shops = shops()
+    context.airport = airport
+    context.get_desk_link = get_desk_link
     return context
 
-def retrieve_shops() -> list[Shop]:
-    return frappe.get_list('Shop', fields='*')
+def shops() -> list[dict]:
+    shops: list[dict] = _all_shops()
+    for shop in shops:
+        shop['rooms'] = Shop.rooms(shop)
+    return shops
 
+def _all_shops() -> list[dict]:
+    fields = [
+        'name',
+        'shop_type',
+    ]
+    return frappe.get_all('Shop', fields=fields)
 
-    # context.color = frappe.form_dict.color if frappe.form_dict.color else 'black'
-    #Parameter name in /page?name="test" == frappe.form_dict.name
+def get_desk_link(shop: (dict | Shop), *, doctype='Shop') -> str:
+    name = shop.get('name')
+    html = f'<a href="/app/Form/{doctype}/{name}" style="font-weight: bold;">Shop {name}</a>'
+    return html
+
+def airport(room_name: str) -> str:
+    return frappe.get_cached_value('Room', room_name, 'airport')
