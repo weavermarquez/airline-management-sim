@@ -2,7 +2,7 @@
 // For license information, please see license.txt
 
 frappe.ui.form.on("Lease", {
-	setup: function (frm) {
+	onload: function (frm) {
 		
         frm.set_df_property('periods', 'cannot_add_rows', true);
         frm.set_df_property('periods', 'cannot_delete_rows', true);
@@ -33,11 +33,14 @@ frappe.ui.form.on("Lease", {
         		fieldname: 'amount',
         		fieldtype: 'Currency',
 				default: "500",
+   				non_negative: true,
+   				reqd: true,
     		},
     		{
         		label: 'Reference Number',
         		fieldname: 'reference_no',
         		fieldtype: 'Data',
+   				reqd: true,
 				// default: frm.doc.leasing_of,
     		},
 			], (values) => {
