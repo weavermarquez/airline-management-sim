@@ -33,6 +33,18 @@ class Shop(Document):
     # end: auto-generated types
     pass
 
+    def onload(self):
+        """Gets called when the form is loaded in Desk"""
+        frappe.log("Shop.onload")
+
+    def __init__(self, *args, **kwargs):
+        frappe.log("Shop.__init__")
+        super().__init__(*args, **kwargs)
+
+    def __setup__(self):
+        frappe.log("Shop.__setup__")
+        if self.shop_number == 42:
+            frappe.log("Shit's fucked!!")
 
     @staticmethod
     def rooms(shop: dict | Document) -> list[str]:
