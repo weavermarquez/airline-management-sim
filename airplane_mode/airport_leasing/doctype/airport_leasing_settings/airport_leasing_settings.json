@@ -34,7 +34,7 @@
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2024-08-31 03:12:45.781059",
+ "modified": "2024-11-17 19:44:40.034025",
  "modified_by": "Administrator",
  "module": "Airport Leasing",
  "name": "Airport Leasing Settings",
@@ -47,6 +47,16 @@
    "print": 1,
    "read": 1,
    "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "print": 1,
+   "read": 1,
+   "role": "Airport Property Manager",
    "share": 1,
    "write": 1
   }

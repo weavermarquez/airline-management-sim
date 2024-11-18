@@ -47,7 +47,7 @@
    "link_fieldname": "airport"
   }
  ],
- "modified": "2024-08-27 17:16:55.519598",
+ "modified": "2024-11-17 19:52:16.674878",
  "modified_by": "Administrator",
  "module": "Airplane Mode",
  "name": "Airport",
@@ -104,6 +104,10 @@
    "report": 1,
    "role": "Flight Crew Member",
    "share": 1
+  },
+  {
+   "role": "All",
+   "select": 1
   }
  ],
  "sort_field": "modified",
