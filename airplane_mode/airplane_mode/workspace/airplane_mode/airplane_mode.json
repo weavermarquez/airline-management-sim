@@ -1,6 +1,6 @@
 {
  "charts": [],
- "content": "[{\"id\":\"g8QSp2VECZ\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\">Airplane Mode</span>\",\"col\":12}},{\"id\":\"VKQBxR0bFp\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"All Airplanes\",\"col\":3}},{\"id\":\"3LX-AARfya\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Airlines\",\"col\":3}},{\"id\":\"kj4YTOSo4E\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Airplane Flight\",\"col\":3}},{\"id\":\"dJHbpWVUMO\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Airport\",\"col\":3}},{\"id\":\"UWRH5THRza\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Airplane Ticket Add On Type\",\"col\":3}},{\"id\":\"kSKgZvpRx4\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\">Flight Bookings</span>\",\"col\":12}},{\"id\":\"uGzalLRqzG\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Airplane Add On Cart\",\"col\":3}},{\"id\":\"v2zRSq-DHl\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Airplane Ticket\",\"col\":3}},{\"id\":\"1KXk26Vtcw\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\"><b>Etc.<br></b></span>\",\"col\":12}},{\"id\":\"TSd1hkNIfT\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"All Passengers\",\"col\":3}},{\"id\":\"P6ylC-dfi3\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Revenue By Airline\",\"col\":3}},{\"id\":\"vrnqRZjSpR\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\"><b>Airport Leasing <br></b></span>\",\"col\":12}},{\"id\":\"qbSVJ-cazw\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Active Leases\",\"col\":3}},{\"id\":\"txrpt7vzFY\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Airport Rooms\",\"col\":3}},{\"id\":\"nQYnXiqeB7\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Shop\",\"col\":3}},{\"id\":\"_m3oUb59s4\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Items\",\"col\":3}},{\"id\":\"dzpQo_gNKu\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Sales Orders\",\"col\":3}},{\"id\":\"ui-1vwNsFQ\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Sales Invoices\",\"col\":3}},{\"id\":\"9k8sSG3l7l\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Customer\",\"col\":3}}]",
+ "content": "[{\"id\":\"g8QSp2VECZ\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\">Airplane Mode</span>\",\"col\":12}},{\"id\":\"VKQBxR0bFp\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"All Airplanes\",\"col\":3}},{\"id\":\"3LX-AARfya\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Airlines\",\"col\":3}},{\"id\":\"kj4YTOSo4E\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Airplane Flight\",\"col\":3}},{\"id\":\"dJHbpWVUMO\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Airport\",\"col\":3}},{\"id\":\"UWRH5THRza\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Airplane Ticket Add On Type\",\"col\":3}},{\"id\":\"kYDc-YzAn8\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Crew Member\",\"col\":3}},{\"id\":\"kSKgZvpRx4\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\">Flight Bookings</span>\",\"col\":12}},{\"id\":\"uGzalLRqzG\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Airplane Add On Cart\",\"col\":3}},{\"id\":\"v2zRSq-DHl\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Airplane Ticket\",\"col\":3}},{\"id\":\"1KXk26Vtcw\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\"><b>Etc.<br></b></span>\",\"col\":12}},{\"id\":\"TSd1hkNIfT\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"All Passengers\",\"col\":3}},{\"id\":\"P6ylC-dfi3\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Revenue By Airline\",\"col\":3}},{\"id\":\"vrnqRZjSpR\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\"><b>Airport Leasing <br></b></span>\",\"col\":12}},{\"id\":\"qbSVJ-cazw\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Active Leases\",\"col\":3}},{\"id\":\"txrpt7vzFY\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Airport Rooms\",\"col\":3}},{\"id\":\"nQYnXiqeB7\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Shop\",\"col\":3}},{\"id\":\"_m3oUb59s4\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Items\",\"col\":3}},{\"id\":\"dzpQo_gNKu\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Sales Orders\",\"col\":3}},{\"id\":\"ui-1vwNsFQ\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Sales Invoices\",\"col\":3}},{\"id\":\"9k8sSG3l7l\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Customer\",\"col\":3}}]",
  "creation": "2024-05-15 19:56:32.104475",
  "custom_blocks": [],
  "docstatus": 0,
@@ -13,7 +13,7 @@
  "is_hidden": 0,
  "label": "Airplane Mode",
  "links": [],
- "modified": "2024-08-27 14:59:01.772925",
+ "modified": "2024-11-18 01:38:23.692286",
  "modified_by": "Administrator",
  "module": "Airplane Mode",
  "name": "Airplane Mode",
@@ -66,6 +66,14 @@
    "doc_view": "List",
    "label": "Airplane Ticket",
    "link_to": "Airplane Ticket",
+   "stats_filter": "[]",
+   "type": "DocType"
+  },
+  {
+   "color": "Grey",
+   "doc_view": "List",
+   "label": "Crew Member",
+   "link_to": "Crew Member",
    "stats_filter": "[]",
    "type": "DocType"
   },

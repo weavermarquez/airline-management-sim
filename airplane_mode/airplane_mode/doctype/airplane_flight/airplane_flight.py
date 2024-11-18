@@ -32,8 +32,36 @@ class AirplaneFlight(WebsiteGenerator):
 		time_of_departure: DF.Time
 	# end: auto-generated types
 
-	# TODO Check if this refactor is suitable
-	def cascade_value(self, doctype, filters, fields_to_cascade):
+	# ==================== 
+	# CONTROLLERS
+	# ====================
+
+	def before_submit(self):
+		self.status = 'Completed'
+		pass
+
+	def on_update(self):
+		gate_number_changed = self.has_value_changed("gate_number")
+		if gate_number_changed:
+			self.update_gate_numbers()
+
+
+	# ==================== 
+	# PUBLIC INSTANCE METHODS
+	# ====================
+
+	def update_gate_numbers(self):
+		# Update associated Tickets.
+		self.cascade_value(
+			"Airplane Ticket", 
+			filters={'flight': self.name}, 
+			fields_to_cascade={'gate_number': 'gate_number'}
+		)
+		# NOTE Ah, I need to modify this so that it can be changed if a Ticket had been submitted.
+		# But, for a ticket to be submitted, it needs to be Boarded? So it probably shouldn't be able to be edited after boarding...
+
+
+	def cascade_value(self, doctype: str, *, filters: dict = None, fields_to_cascade: dict = None):
 		"""
 		Cascade values from the current object to associated DocType, such as Airplane Tickets.
     
@@ -49,37 +77,45 @@ class AirplaneFlight(WebsiteGenerator):
 		
 		self.cascade_value("Airplane Ticket", {'flight': self.name}, {'gate_number': 'gate_number'})
 		"""
-		items = frappe.get_list(doctype, 
+		items: list[dict] = frappe.get_list(
+			doctype, 
 			fields=["name"] + list(fields_to_cascade.values()),
-			filters=filters)
+			filters=filters
+		)
 
 		for item in items:
 			updated = False
 			for src_field, dst_field in fields_to_cascade.items():
 
 				if getattr(self, src_field) != item[dst_field]:
-					doc = frappe.get_doc(doctype, item.name) 
+					doc = frappe.get_cached_doc(doctype, item.name) 
 					doc.set(dst_field, getattr(self, src_field))
 					updated = True
-					# Hmm, is it efficient to use get_doc multiple times?
-					# NOTE This seems like premature optimization though.
         
 			if updated:
 				doc.save()
 				doc.notify_update()
 
-	def update_gate_numbers(self):
-		self.cascade_value("Airplane Ticket", {'flight': self.name}, {'gate_number': 'gate_number'})
-		# NOTE Ah, I need to modify this so that it can be changed if a Ticket had been submitted.
-		# But, for a ticket to be submitted, it needs to be Boarded? So it probably shouldn't be able to be edited after boarding...
+	def overcapacity(self) -> bool:
+		from airplane_mode.airplane_mode.doctype.airplane_flight.airplane_flight import AirplaneFlight
+		count = AirplaneFlight.ticket_count(self.name)
+		capacity = frappe.db.get_value('Airplane', self.airplane, 'capacity') 
+		return count >= capacity
 
+	# ==================== 
+	# STATIC METHODS
+	# ====================
 
-	def before_submit(self):
-		self.status = 'Completed'
-		pass
+	@staticmethod
+	def ticket_count(flight_name: str) -> int:
+		return frappe.db.count('Airplane Ticket', filters={'flight': flight_name})
 
-	def on_update(self):
-		gate_number_changed = self.has_value_changed("gate_number")
-		if gate_number_changed:
-			# Update associated Tickets.
-			self.update_gate_numbers()
+	@staticmethod
+	def overcapacity(flight_name: str):
+		from airplane_mode.airplane_mode.doctype.airplane_flight.airplane_flight import AirplaneFlight
+		count = AirplaneFlight.ticket_count(flight_name)
+
+		airplane = frappe.get_value('Airplane Flight', flight_name)
+
+		capacity = frappe.db.get_value('Airplane', flight.airplane, 'capacity') 
+		return count >= capacity
