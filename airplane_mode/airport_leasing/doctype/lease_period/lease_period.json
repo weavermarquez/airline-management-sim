@@ -3,7 +3,6 @@
  "allow_rename": 1,
  "creation": "2024-10-17 14:33:10.005730",
  "doctype": "DocType",
- "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
   "invoice",
@@ -13,23 +12,27 @@
  ],
  "fields": [
   {
+   "columns": 1,
    "fieldname": "invoice",
    "fieldtype": "Link",
    "label": "Invoice",
    "options": "Sales Invoice"
   },
   {
+   "columns": 1,
    "fieldname": "start_date",
    "fieldtype": "Date",
    "label": "Start Date"
   },
   {
+   "columns": 1,
    "fieldname": "end_date",
    "fieldtype": "Date",
    "label": "End Date"
   },
   {
    "allow_on_submit": 1,
+   "columns": 1,
    "fieldname": "status",
    "fieldtype": "Read Only",
    "is_virtual": 1,
@@ -39,7 +42,7 @@
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2024-11-17 18:19:31.614537",
+ "modified": "2024-11-17 18:27:43.946196",
  "modified_by": "Administrator",
  "module": "Airport Leasing",
  "name": "Lease Period",

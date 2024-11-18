@@ -3,7 +3,6 @@
  "allow_rename": 1,
  "creation": "2024-10-16 14:43:55.570080",
  "doctype": "DocType",
- "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
   "payment_date",
@@ -12,6 +11,7 @@
  ],
  "fields": [
   {
+   "columns": 1,
    "fetch_from": "payment_entry.posting_date",
    "fetch_if_empty": 1,
    "fieldname": "payment_date",
@@ -19,12 +19,14 @@
    "label": "Payment Date"
   },
   {
+   "columns": 1,
    "fieldname": "payment_entry",
    "fieldtype": "Link",
    "label": "Payment Entry",
    "options": "Payment Entry"
   },
   {
+   "columns": 1,
    "fetch_from": "payment_entry.paid_amount",
    "fetch_if_empty": 1,
    "fieldname": "paid_amount",
@@ -35,7 +37,7 @@
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2024-11-08 10:58:12.393259",
+ "modified": "2024-11-17 18:26:44.760439",
  "modified_by": "Administrator",
  "module": "Airport Leasing",
  "name": "Lease Payment",
