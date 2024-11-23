@@ -189,9 +189,17 @@ class Lease(Document):
 		return max(periods, key=lambda period: period.start_date) if periods else None
 
 
-	def send_reminder(self) -> None:
-		"""Use lease.run_method('send_reminder') to email tenant monthly rent reminder."""
-		return
+	def send_reminder(self, *, with_hooks: bool = False) -> None:
+		"""Email tenant the monthly rent reminder. 
+
+		:usage: send_reminder(with_hooks=True) :: call no-op version of itself 
+			with self.run_method, triggering hooks.
+
+		:usage: send_reminder() :: no-op
+		:usage: send_reminder(with_hooks=False) :: no-op
+		"""
+		if with_hooks:
+			self.run_method('send_reminder')
 
 	@frappe.whitelist()
 	def receive_payment(self, amount: DF.Currency, reference_no: DF.Data):
@@ -202,14 +210,22 @@ class Lease(Document):
 			lease_payment = LeasePayment.new_payment(self, amount, reference_no)
 			self.append('payments', lease_payment)
 			self.save()
-			self.run_method('send_payment_receipt')
+			self.send_payment_receipt(with_hooks=True)
 		except Exception as e:
 			frappe.log_error(f"Failed to process payment: {str(e)}")
 			frappe.throw("Failed to process payment. Please try again or contact support.")
 
-	def send_payment_receipt(self) -> None:
-		"""Use lease.run_method('send_payment_receipt') to email tenant payment receipt."""
-		return
+	def send_payment_receipt(self, *, with_hooks: bool = False) -> None:
+		"""Email a payment receipt to the tenant.
+
+		:usage: send_payment_receipt(with_hooks=True) :: call no-op version of itself 
+			with self.run_method, triggering hooks.
+
+		:usage: send_payment_receipt() :: no-op
+		:usage: send_payment_receipt(with_hooks=False) :: no-op
+		"""
+		if with_hooks:
+			self.run_method('send_payment_receipt')
 
 	def set_status(self, *, status=None, update=False, update_modified=True) -> None:
 		"""Modify lease status based on child periods and end_date.
@@ -386,4 +402,4 @@ def send_reminder_monthly() -> None:
 
 	for lease_name in frappe.get_all("Lease", pluck=pluck, filters=filters):
 		lease: Lease = frappe.get_doc('Lease', lease_name)
-		lease.run_method('send_reminder')
+		lease.send_reminder(with_hooks=True)
