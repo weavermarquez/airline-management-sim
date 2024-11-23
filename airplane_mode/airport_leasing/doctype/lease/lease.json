@@ -127,6 +127,7 @@
    "fieldtype": "Currency",
    "is_virtual": 1,
    "label": "Outstanding Balance",
+   "no_copy": 1,
    "non_negative": 1,
    "read_only": 1
   },
@@ -215,6 +216,12 @@
    "write": 1
   },
   {
+   "permlevel": 1,
+   "read": 1,
+   "role": "System Manager",
+   "write": 1
+  },
+  {
    "cancel": 1,
    "email": 1,
    "export": 1,
@@ -224,6 +231,12 @@
    "role": "Airport Property Manager",
    "share": 1,
    "submit": 1,
+   "write": 1
+  },
+  {
+   "permlevel": 1,
+   "read": 1,
+   "role": "Airport Property Manager",
    "write": 1
   },
   {
@@ -238,6 +251,11 @@
    "role": "Airport Tenant",
    "share": 1,
    "write": 1
+  },
+  {
+   "permlevel": 1,
+   "read": 1,
+   "role": "Airport Tenant"
   }
  ],
  "sort_field": "modified",
