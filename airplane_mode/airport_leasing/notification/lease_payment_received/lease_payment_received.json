@@ -1,0 +1,36 @@
+{
+ "attach_print": 1,
+ "channel": "Email",
+ "condition": "",
+ "creation": "2024-11-22 19:04:16.986865",
+ "days_in_advance": 0,
+ "docstatus": 0,
+ "doctype": "Notification",
+ "document_type": "Lease",
+ "enabled": 1,
+ "event": "Method",
+ "idx": 0,
+ "is_standard": 1,
+ "message": "<h2 id=\"hello-docleased_to\">Hello {{ doc.leased_to }},</h2>\n\n<p>You have successfully submitted a payment for lease {{ doc.name }} for room {{ doc.leasing_of }}.\nYou now have an outstanding balance of {{ doc.outstanding_balance }}. \nIt is currently {{ doc.status }}.</p>\n\n<pre><code>Next invoice sent on: *{{ doc.next_date }}*\nEnd of lease: *{{ doc.end_date }}*\n</code></pre>\n\n<p>Best Regards,</p>\n\n<p>{{ doc.leased_from }} Management</p>\n",
+ "message_type": "Markdown",
+ "method": "send_payment_receipt",
+ "modified": "2024-11-22 19:06:15.691399",
+ "modified_by": "Administrator",
+ "module": "Airport Leasing",
+ "name": "Lease Payment Received",
+ "owner": "Administrator",
+ "print_format": "Rent Receipt",
+ "recipients": [
+  {
+   "receiver_by_document_field": "",
+   "receiver_by_role": "Customer"
+  },
+  {
+   "receiver_by_document_field": "owner",
+   "receiver_by_role": "System Manager"
+  }
+ ],
+ "send_system_notification": 1,
+ "send_to_all_assignees": 0,
+ "subject": "{{ doc.name }} Payment Received"
+}

@@ -202,9 +202,14 @@ class Lease(Document):
 			lease_payment = LeasePayment.new_payment(self, amount, reference_no)
 			self.append('payments', lease_payment)
 			self.save()
+			self.run_method('send_payment_receipt')
 		except Exception as e:
 			frappe.log_error(f"Failed to process payment: {str(e)}")
 			frappe.throw("Failed to process payment. Please try again or contact support.")
+
+	def send_payment_receipt(self) -> None:
+		"""Use lease.run_method('send_payment_receipt') to email tenant payment receipt."""
+		return
 
 	def set_status(self, *, status=None, update=False, update_modified=True) -> None:
 		"""Modify lease status based on child periods and end_date.
