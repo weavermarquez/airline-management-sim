@@ -1,0 +1,238 @@
+{
+ "charts": [],
+ "content": "[{\"id\":\"IrrdR_rL6_\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\">Airport Leasing</span>\",\"col\":12}},{\"id\":\"dwmAmO7UMe\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\"><b>Your Shortcuts</b></span>\",\"col\":12}},{\"id\":\"t2EKWNeZyV\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Customer Profile\",\"col\":3}},{\"id\":\"R8s5etD1jC\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Active Leases\",\"col\":3}},{\"id\":\"j_SvQxekwt\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Shop Directory\",\"col\":3}},{\"id\":\"oJVU05PzDq\",\"type\":\"spacer\",\"data\":{\"col\":12}},{\"id\":\"cYI-elYs07\",\"type\":\"card\",\"data\":{\"card_name\":\"Leasing\",\"col\":4}},{\"id\":\"7tv_MIQgzi\",\"type\":\"card\",\"data\":{\"card_name\":\"Masters\",\"col\":4}},{\"id\":\"lozSb1kMXu\",\"type\":\"card\",\"data\":{\"card_name\":\"Reference\",\"col\":4}},{\"id\":\"GME9d-vOzX\",\"type\":\"card\",\"data\":{\"card_name\":\"Report\",\"col\":4}}]",
+ "creation": "2024-11-22 19:52:31.783036",
+ "custom_blocks": [],
+ "docstatus": 0,
+ "doctype": "Workspace",
+ "for_user": "",
+ "hide_custom": 0,
+ "icon": "milestone",
+ "idx": 0,
+ "indicator_color": "",
+ "is_hidden": 0,
+ "label": "Airport Leasing",
+ "links": [
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Leasing",
+   "link_count": 4,
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Card Break"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Lease",
+   "link_count": 0,
+   "link_to": "Lease",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Shop",
+   "link_count": 0,
+   "link_to": "Shop",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Room",
+   "link_count": 0,
+   "link_to": "Room",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Airport Leasing Settings",
+   "link_count": 0,
+   "link_to": "Airport Leasing Settings",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Masters",
+   "link_count": 4,
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Card Break"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Customer",
+   "link_count": 0,
+   "link_to": "Customer",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Item",
+   "link_count": 0,
+   "link_to": "Item",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Item Price",
+   "link_count": 0,
+   "link_to": "Item Price",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Airport",
+   "link_count": 0,
+   "link_to": "Airport",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Report",
+   "link_count": 3,
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Card Break"
+  },
+  {
+   "dependencies": "Report",
+   "hidden": 0,
+   "is_query_report": 1,
+   "label": "Lease Payments per Month",
+   "link_count": 0,
+   "link_to": "Lease Payments per Month",
+   "link_type": "Report",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "dependencies": "Shop",
+   "hidden": 0,
+   "is_query_report": 1,
+   "label": "Shops per Airport",
+   "link_count": 0,
+   "link_to": "Shops per Airport",
+   "link_type": "Report",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 1,
+   "label": "Vacancy per Airport",
+   "link_count": 0,
+   "link_to": "Vacancy per Airport",
+   "link_type": "Report",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Reference",
+   "link_count": 3,
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Card Break"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Sales Invoice",
+   "link_count": 0,
+   "link_to": "Sales Invoice",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Payment Entry",
+   "link_count": 0,
+   "link_to": "Payment Entry",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "User",
+   "link_count": 0,
+   "link_to": "User",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  }
+ ],
+ "modified": "2024-11-22 23:03:02.095365",
+ "modified_by": "Administrator",
+ "module": "Airport Leasing",
+ "name": "Airport Leasing",
+ "number_cards": [],
+ "owner": "Administrator",
+ "parent_page": "",
+ "public": 1,
+ "quick_lists": [],
+ "roles": [
+  {
+   "role": "Airport Property Manager"
+  },
+  {
+   "role": "Airport Tenant"
+  }
+ ],
+ "sequence_id": 29.0,
+ "shortcuts": [
+  {
+   "color": "Grey",
+   "doc_view": "List",
+   "label": "Active Leases",
+   "link_to": "Lease",
+   "stats_filter": "[[\"Lease\",\"docstatus\",\"=\",\"1\",false]]",
+   "type": "DocType"
+  },
+  {
+   "color": "Grey",
+   "doc_view": "List",
+   "label": "Shop Directory",
+   "type": "URL",
+   "url": "/airport_shops"
+  },
+  {
+   "color": "Grey",
+   "doc_view": "List",
+   "label": "Customer Profile",
+   "type": "URL",
+   "url": "/customer-profile"
+  }
+ ],
+ "title": "Airport Leasing"
+}
