@@ -32,6 +32,7 @@ class Lease(Document):
 		from frappe.types import DF
 
 		amended_from: DF.Link | None
+		discounted_rental_rate: DF.Currency
 		end_date: DF.Date
 		leased_from: DF.Link
 		leased_to: DF.Link
@@ -41,7 +42,7 @@ class Lease(Document):
 		payments: DF.Table[LeasePayment]
 		period_length: DF.Literal["Monthly", "Quarterly"]
 		periods: DF.Table[LeasePeriod]
-		rental_rate: DF.Int
+		rental_rate: DF.Currency
 		start_date: DF.Date
 		status: DF.Literal["Draft", "Submitted", "Active", "Overdue", "Offboarding", "Terminated", "Cancelled"]
 		total_owing: DF.Currency
@@ -145,8 +146,8 @@ class Lease(Document):
 		# return self.total_owing - self.total_paid
 
 	@property
-	def rental_rate(self):
-		return frappe.get_cached_doc('Room', self.leasing_of).rental_rate
+	def rental_rate(self) -> float:
+		return self.auto_rental_rate()
 
 	# ==================== 
 	# PUBLIC INSTANCE METHODS
@@ -160,6 +161,17 @@ class Lease(Document):
 		# self.save()
 		# This will cause the "Saved after opening Error.""
 
+	def auto_rental_rate(self) -> float:
+		"""Rental rates from most to least important priority:
+		1. User-set discounted rate in Lease
+		2. User-set override in Room
+		3. User-set global rate in Airport Leasing Settings
+		4. App-set global rate in Airport Leasing Settings"""
+
+		if self.discounted_rental_rate:
+			return self.discounted_rental_rate
+		else:
+			return frappe.get_cached_doc('Room', self.leasing_of).rental_rate
 
 	def period_weeks(self) -> int:
 		"""Get number of weeks for this lease's period length."""

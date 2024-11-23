@@ -72,10 +72,11 @@ class Room(Document):
 	# ====================
 
 	def auto_rental_rate(self) -> float:
-		"""Order of selecting rental rates
-		1. User-set document rate in Room
-		2. User-set global rate in Airport Leasing Settings
-		3. App-set global rate in Airport Leasing Settings"""
+		"""Rental rates from most to least important priority:
+		1. User-set override in Lease
+		2. User-set override in Room
+		3. User-set global rate in Airport Leasing Settings
+		4. App-set global rate in Airport Leasing Settings"""
 
 		if self.rental_rate_override:
 			return self.rental_rate_override

@@ -111,7 +111,8 @@ class LeasePeriod(Document):
 		item = LeasePeriod.new_invoice_item(
 			room=room,
 			start_date=dates['start_date'],
-			weeks=lease.period_weeks()
+			weeks=lease.period_weeks(),
+			rate=lease.rental_rate,
 		)
 		
 		return LeasePeriod.new_sales_invoice(
@@ -121,7 +122,7 @@ class LeasePeriod(Document):
 		)
 
 	@staticmethod
-	def new_invoice_item(room: str, start_date: DF.Date, weeks: float) -> 'SalesInvoiceItem':
+	def new_invoice_item(room: str, start_date: DF.Date, weeks: float, rate: float) -> 'SalesInvoiceItem':
 		"""
 		Create a new invoice item for room lease.
 		
@@ -129,6 +130,7 @@ class LeasePeriod(Document):
 			room: Room identifier
 			start_date: Period start date
 			weeks: Duration in weeks
+			rate: Rental rate per week
 			
 		Returns:
 			SalesInvoiceItem: New invoice item document
@@ -142,13 +144,9 @@ class LeasePeriod(Document):
 					item_code = room,
 					delivery_date = start_date,
 					qty = weeks,
-					uom = Room.UOM)
-
-		# NOTE I am not happy with this API. Easily confusing the 
-		# property as the actual value, and forgetting about auto_rental_rate().
-		# At the very least, get_value is always incorrect!!!
-		# Get rate from Room document or pricing rules
-		item.rate = frappe.get_doc('Room', room).auto_rental_rate()
+					uom = Room.UOM,
+					rate=rate,
+					)
 
 		return item
 
