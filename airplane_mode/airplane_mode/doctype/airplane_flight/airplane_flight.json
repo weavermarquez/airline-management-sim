@@ -26,6 +26,7 @@
   "time_of_departure",
   "column_break_xezm",
   "duration",
+  "section_break_afbg",
   "crew_on_flight"
  ],
  "fields": [
@@ -143,7 +144,7 @@
   },
   {
    "fieldname": "crew_on_flight",
-   "fieldtype": "Table MultiSelect",
+   "fieldtype": "Table",
    "label": "Crew on Flight",
    "options": "Flight Crew"
   },
@@ -152,6 +153,10 @@
    "fieldtype": "Data",
    "label": "Gate Number",
    "reqd": 1
+  },
+  {
+   "fieldname": "section_break_afbg",
+   "fieldtype": "Section Break"
   }
  ],
  "has_web_view": 1,
@@ -164,7 +169,7 @@
    "link_fieldname": "flight"
   }
  ],
- "modified": "2024-08-26 13:35:23.115447",
+ "modified": "2024-11-23 01:28:43.105028",
  "modified_by": "Administrator",
  "module": "Airplane Mode",
  "name": "Airplane Flight",

@@ -18,7 +18,7 @@ class AirplaneFlight(WebsiteGenerator):
 
 		airplane: DF.Link
 		amended_from: DF.Link | None
-		crew_on_flight: DF.TableMultiSelect[FlightCrew]
+		crew_on_flight: DF.Table[FlightCrew]
 		date_of_departure: DF.Date
 		destination_airport: DF.Link
 		destination_airport_code: DF.ReadOnly | None
