@@ -18,7 +18,7 @@ def _all_shops() -> list[dict]:
         'name',
         'shop_type',
     ]
-    return frappe.get_all('Shop', fields=fields)
+    return frappe.get_all('Shop', fields=fields, order_by='name asc')
 
 def get_desk_link(shop: (dict | Shop), *, doctype='Shop') -> str:
     name = shop.get('name')

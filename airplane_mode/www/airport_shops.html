@@ -16,13 +16,16 @@ metatags:
 <menu>
     {% for shop in shops %}
     <li>
-        <strong>{{ shop.name }}</strong>
-        <i>{{ shop.shop_type }}</i> 
+        <strong>{{ shop.name }}</strong> — <i>{{ shop.shop_type }}</i> 
         <br>
         {# {{ airport(shop.rooms[0]) }} #}
-        Located at: <strong>{{ shop.rooms|join(', ') }}</strong>
-        <br>
-        {{ get_desk_link(shop) }}
+        {%if shop.rooms %} 
+          Located at: <strong>{{ shop.rooms|join(', ') }}</strong> 
+          <br>
+          {{ get_desk_link(shop) }}
+        {% else %} 
+          <i>Coming Soon!</i>
+        {% endif %}
     </li><br>
     {% endfor %}
 </menu>
