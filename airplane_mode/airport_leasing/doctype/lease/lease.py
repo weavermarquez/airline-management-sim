@@ -268,10 +268,17 @@ class Lease(Document):
 		return frappe.get_doc(json.loads(doc))
 
 	@staticmethod
-	def autorenew(doc: str) -> None:
-		"""On next_date, prepare a new Lease Period or end the lease.
-		The next_date can be within one period of the thingy."""
-		lease: Lease = Lease.retrieve_doc(doc)
+	def autorenew(doc: (str | Lease)) -> None:
+		""" On next_date, prepare a new Lease Period or end the lease.
+		The next_date can be within one period of the thingy.
+		
+		Takes in either a Lease instance or its JSON representation.
+		"""
+		if isinstance(doc, str):
+			lease: Lease = Lease.retrieve_doc(doc)
+		else:
+			lease = doc
+
 		today = frappe.utils.today()
 
 		lease.set_status(update_modified=False)
@@ -354,15 +361,15 @@ def get_filtered_child_rows(doctype, txt, searchfield, start, page_len, filters)
 
 def autorenew_daily() -> None:
 	"""Run autorenew on all Submitted leases daily"""
-	fields = ['name']
+	pluck = 'name'
 	filters = [
 		["docstatus", '=', 1], 
 		["next_date", '=', frappe.utils.today()],
 	]
 
-	for lease in frappe.get_all("Lease", fields=fields, filters=filters):
-		doc_json = frappe.get_doc('Lease', lease.name).as_json()
-		Lease.run_method('autorenew', doc_json)
+	for lease_name in frappe.get_all("Lease", pluck=pluck, filters=filters):
+		lease: Lease = frappe.get_doc('Lease', lease_name)
+		lease.run_method('autorenew')
 
 def send_reminder_monthly() -> None:
 	"""Check lease rent reminders to be sent monthly"""
@@ -370,12 +377,13 @@ def send_reminder_monthly() -> None:
 	if not enabled:
 		return
 
-	fields = ['name']
+	pluck = 'name'
 	filters = [
 		["docstatus", '=', 1], 
 		# ['outstanding_balance', ">", 0], 
 		# NOTE I could use status == Overdue. But frankly just every active lease is fine.
 	]
 
-	for lease in frappe.get_all("Lease", fields=fields, filters=filters):
-		frappe.get_doc('Lease', lease.name).run_method('send_reminder')
+	for lease_name in frappe.get_all("Lease", pluck=pluck, filters=filters):
+		lease: Lease = frappe.get_doc('Lease', lease_name)
+		lease.run_method('send_reminder')
