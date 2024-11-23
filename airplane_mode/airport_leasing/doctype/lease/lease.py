@@ -385,7 +385,7 @@ def autorenew_daily() -> None:
 
 	for lease_name in frappe.get_all("Lease", pluck=pluck, filters=filters):
 		lease: Lease = frappe.get_doc('Lease', lease_name)
-		lease.run_method('autorenew')
+		Lease.autorenew(lease)
 
 def send_reminder_monthly() -> None:
 	"""Check lease rent reminders to be sent monthly"""
