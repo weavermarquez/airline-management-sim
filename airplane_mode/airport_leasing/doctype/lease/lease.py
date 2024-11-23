@@ -221,7 +221,7 @@ class Lease(Document):
 			from airplane_mode.airport_leasing.doctype.lease_payment.lease_payment import LeasePayment
 			lease_payment = LeasePayment.new_payment(self, amount, reference_no)
 			self.append('payments', lease_payment)
-			self.save()
+			self.save(ignore_permissions=True)
 			self.send_payment_receipt(with_hooks=True)
 		except Exception as e:
 			frappe.log_error(f"Failed to process payment: {str(e)}")
