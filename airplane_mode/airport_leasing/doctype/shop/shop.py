@@ -43,7 +43,7 @@ class Shop(Document):
 
     def __setup__(self):
         frappe.log("Shop.__setup__")
-        if self.shop_number == 42:
+        if self.get('shop_number', 0) == 42:
             frappe.log("Shit's fucked!!")
 
     @staticmethod
