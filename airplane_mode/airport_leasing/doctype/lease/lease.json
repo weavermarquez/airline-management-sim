@@ -11,10 +11,11 @@
   "amended_from",
   "leasing_of",
   "rental_rate",
-  "status",
+  "discounted_rental_rate",
   "column_break_onqo",
   "leased_from",
   "leased_to",
+  "status",
   "section_break_uvcn",
   "start_date",
   "period_length",
@@ -87,7 +88,7 @@
   },
   {
    "fieldname": "rental_rate",
-   "fieldtype": "Int",
+   "fieldtype": "Currency",
    "is_virtual": 1,
    "label": "Rental Rate",
    "non_negative": 1
@@ -167,6 +168,7 @@
    "fieldtype": "Currency",
    "is_virtual": 1,
    "label": "Total Owing",
+   "no_copy": 1,
    "non_negative": 1,
    "read_only": 1
   },
@@ -176,6 +178,7 @@
    "fieldtype": "Currency",
    "is_virtual": 1,
    "label": "Total Paid",
+   "no_copy": 1,
    "non_negative": 1,
    "read_only": 1
   },
@@ -190,12 +193,20 @@
    "no_copy": 1,
    "options": "Draft\nSubmitted\nActive\nOverdue\nOffboarding\nTerminated\nCancelled",
    "read_only": 1
+  },
+  {
+   "depends_on": "eval: \n  (frappe.user.has_role('Airport Property Manager')) || \n  (frappe.user.has_role('Airport Tenant') && doc.discounted_rental_rate != 0)\n",
+   "fieldname": "discounted_rental_rate",
+   "fieldtype": "Currency",
+   "label": "Discounted Rental Rate",
+   "non_negative": 1,
+   "permlevel": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2024-11-17 19:37:22.502999",
+ "modified": "2024-11-23 00:28:23.079590",
  "modified_by": "Administrator",
  "module": "Airport Leasing",
  "name": "Lease",
