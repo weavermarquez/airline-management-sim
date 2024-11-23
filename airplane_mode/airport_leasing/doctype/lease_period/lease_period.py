@@ -56,7 +56,7 @@ class LeasePeriod(Document):
 	# ====================
 
 	@staticmethod
-	def next_period(lease) -> 'LeasePeriod':
+	def next_period(lease: Document) -> 'LeasePeriod':
 		"""Begin a new Lease Period and send an invoice."""
 		dates = LeasePeriod.calculate_period_dates(lease)
 		invoice = LeasePeriod.create_period_invoice(lease, dates)
@@ -69,7 +69,7 @@ class LeasePeriod(Document):
 		)
 
 	@staticmethod
-	def calculate_period_dates(lease) -> dict:
+	def calculate_period_dates(lease: Document) -> dict:
 		"""Calculate start and end dates for the next period.
 		
 		Returns:
@@ -84,7 +84,7 @@ class LeasePeriod(Document):
 		}
 
 	@staticmethod
-	def _get_period_start_date(lease) -> str:
+	def _get_period_start_date(lease: Document) -> str:
 		"""Determine the start date for the next period."""
 		if not lease.periods:
 			return lease.start_date
@@ -93,7 +93,7 @@ class LeasePeriod(Document):
 		return frappe.utils.add_days(last_period.end_date, 1)
 
 	@staticmethod
-	def _get_period_end_date(lease, start_date: str) -> str:
+	def _get_period_end_date(lease: Document, start_date: str) -> str:
 		"""Calculate the end date based on period length and lease constraints."""
 		period_end = frappe.utils.add_to_date(
 			start_date, 
@@ -102,7 +102,7 @@ class LeasePeriod(Document):
 		return min(period_end, lease.end_date)
 
 	@staticmethod
-	def create_period_invoice(lease, dates: dict) -> SalesInvoice:
+	def create_period_invoice(lease: Document, dates: dict) -> SalesInvoice:
 		"""Create and submit invoice for the period."""
 		room = lease.leasing_of
 		company = lease.leased_from
