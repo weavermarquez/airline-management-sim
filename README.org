@@ -1,0 +1,86 @@
+#+TITLE: Airplane Mode
+#+AUTHOR: Valerie K.
+#+OPTIONS: toc:nil num:nil
+
+Frappe Framework certification project: airline management + airport shop leasing.
+
+*License:* MIT
+
+* Highlights
+
+| Frappe Feature             | Implementation                                        |
+|----------------------------+-------------------------------------------------------|
+| Background Jobs            | Gate number changes propagate to tickets via =enqueue= |
+| Scheduler Events           | Monthly rent reminders (=scheduler_events= hook)      |
+| Fixtures                   | Shop Types seeded on install                          |
+| Single DocType             | Global settings (default rent, reminder toggle)       |
+| Print Designer             | Rent receipt PDF format                               |
+| =set_query= JS API         | Filter link fields to enabled shop types only         |
+| Web Portal                 | Custom-styled shop listings + lead capture form       |
+| Notifications              | Email alerts for bookings and payments                |
+| Reports & Dashboard Charts | Revenue, occupancy, payments per airport              |
+
+* Architecture
+
+#+begin_src mermaid
+graph LR
+    subgraph airplane_mode[Airplane Mode Module]
+        Airline --> Airplane
+        Airplane --> Flight[Airplane Flight]
+        Flight --> Ticket[Airplane Ticket]
+        Flight --> FlightCrew[Flight Crew]
+        CrewMember[Crew Member] --> FlightCrew
+    end
+
+    subgraph airport_leasing[Airport Leasing Module]
+        Airport --> Shop
+        ShopType[Shop Type] --> Shop
+        Tenant --> Lease
+        Shop --> Lease
+        Lease --> LeasePayment[Lease Payment]
+        Settings[Airport Leasing Settings]
+    end
+
+    Airport --> Flight
+#+end_src
+
+* Key Workflows
+
+** Gate Number Propagation
+
+#+begin_src mermaid
+sequenceDiagram
+    participant User
+    participant Flight as Airplane Flight
+    participant Queue as Background Job
+    participant Tickets as Airplane Tickets
+
+    User->>Flight: Update gate number
+    Flight->>Queue: enqueue update job
+    Flight-->>User: Response (non-blocking)
+    Queue->>Tickets: Bulk update gate numbers
+#+end_src
+
+** Monthly Rent Reminders
+
+#+begin_src mermaid
+sequenceDiagram
+    participant Scheduler as Frappe Scheduler
+    participant Lease
+    participant Email as Email Queue
+
+    Scheduler->>Lease: monthly trigger
+    Lease->>Lease: Check settings.enable_reminders
+    Lease->>Lease: Query active leases
+    Lease->>Email: Send reminder per tenant
+#+end_src
+
+* Installation
+
+#+begin_src bash
+bench get-app https://github.com/username/airplane_mode.git
+bench --site your-site.local install-app airplane_mode
+bench --site your-site.local migrate
+#+end_src
+
+Fixtures auto-create Shop Types: Stall, Walk-through, Normal.
